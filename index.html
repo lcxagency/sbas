@@ -159,9 +159,43 @@ select.input{cursor:pointer;-webkit-appearance:none}
 .done-section{margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
 .done-title{font-size:9px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
 @media(max-width:900px){
-  .main{flex-direction:column}.sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border)}
-  .stats{grid-template-columns:repeat(2,1fr)}.topbar{padding:10px 14px}.content{padding:14px}
+  .topbar{padding:8px 12px}
+  .logo-icon{width:32px;height:32px}.logo-icon img{width:32px;height:32px}
+  .logo-text{font-size:12px;letter-spacing:3px}.logo-sub{font-size:7px}
+  .topbar-r{gap:10px}.live{font-size:8px;gap:4px}.clock{font-size:10px}
+  .nav{padding:6px 10px;gap:1px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .nav::-webkit-scrollbar{display:none}
+  .nav-btn{padding:7px 12px;font-size:10px;white-space:nowrap;flex-shrink:0}
+  .main{flex-direction:column;position:relative}
+  .sidebar{position:fixed;top:0;left:0;width:280px;height:100vh;z-index:200;transform:translateX(-100%);transition:transform .3s ease;border-right:1px solid var(--border);border-bottom:none;overflow-y:auto;background:var(--bg2)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:199}
+  .sidebar-overlay.open{display:block}
+  .menu-toggle{display:flex !important;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:18px;cursor:pointer;flex-shrink:0}
+  .sidebar-close{display:flex !important;position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text);font-size:16px;align-items:center;justify-content:center;cursor:pointer;z-index:5}
+  .content{padding:10px 12px}
+  .stats{grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:12px}
+  .stat{padding:12px 8px}.stat-v{font-size:20px}.stat-l{font-size:8px}
+  .pwa-banner{padding:6px 12px;font-size:10px}.pwa-banner button{padding:4px 10px;font-size:9px}
+  .cal-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -12px;padding:0 12px}
+  .cal-scroll::-webkit-scrollbar{display:none}
+  .calgrid{min-width:600px;font-size:8px;grid-template-columns:50px repeat(7,1fr)}
+  .calh{padding:8px 4px;font-size:8px}.calt{font-size:8px;height:40px;padding:0 3px}
+  .calc{height:40px}.calev{font-size:7px;padding:1px 3px}
+  .card{padding:12px;margin-bottom:10px}
+  .slots{grid-template-columns:repeat(2,1fr);gap:6px}
+  .slot{padding:10px}.slot-time{font-size:13px}
+  .todo-tabs{gap:3px;margin-bottom:12px}.todo-tab{padding:10px;gap:6px}
+  .todo-tab .tab-name{font-size:12px}.todo-tab .tab-count{font-size:10px}
+  .todo-item{padding:10px;gap:8px}.todo-text{font-size:12px}
+  .add-bar{gap:4px}.input{padding:7px 10px;font-size:11px}.btn{padding:7px 12px;font-size:10px}
+  .modal{padding:20px;width:95vw}
+  .alert{padding:8px 10px;font-size:10px}
 }
+@media(min-width:901px){
+  .menu-toggle,.sidebar-close,.sidebar-overlay{display:none !important}
+}
+.cal-scroll{overflow:visible}
 .tab-c{animation:fadeIn .35s ease}
 </style>
 </head>
@@ -298,6 +332,7 @@ function App(){
   const[newTodoEnd,setNewTodoEnd]=useState('');
   const[calView,setCalView]=useState('week');
   const[showPwa,setShowPwa]=useState(true);
+  const[sidebarOpen,setSidebarOpen]=useState(false);
   const[todoView,setTodoView]=useState('titouan');
 
   const todayIdx=useMemo(()=>{const d=new Date().getDay();return d===0?6:d-1},[]);
@@ -374,6 +409,7 @@ function App(){
   <div className="app">
     <div className="topbar">
       <div className="logo">
+        <button className="menu-toggle" onClick={()=>setSidebarOpen(!sidebarOpen)} style={{display:'none'}}>&#9776;</button>
         <div className="logo-icon"><img src={"data:image/png;base64,"+LOGO_B64} alt="LCX Agency"/></div>
         <div><div className="logo-text">LCX</div><div className="logo-sub">Agency &middot; S.B.A.S.</div></div>
       </div>
@@ -395,8 +431,10 @@ function App(){
     </div>
 
     <div className="main">
-      <div className="sidebar">
-        <div className="stitle">Equipe</div>
+      <div className={"sidebar-overlay"+(sidebarOpen?' open':'')} onClick={()=>setSidebarOpen(false)}></div>
+      <div className={"sidebar"+(sidebarOpen?' open':'')}>
+        <button className="sidebar-close" onClick={()=>setSidebarOpen(false)} style={{display:'none'}}>&times;</button>
+        <div className="stitle" style={{marginTop:sidebarOpen?8:0}}>Equipe</div>
         <div className={"pcard "+(selUser==='all'?'sel':'')} onClick={()=>setSelUser('all')}>
           <div className="avatar" style={{border:'2px solid #fff'}}>&#8853;</div>
           <div><div className="pname">Vue Globale</div><div className="prole">Tous</div></div>
@@ -480,7 +518,7 @@ function App(){
             <button className="btn btn-sm" onClick={()=>{setShowModal('event');setNewEv({title:'',day:0,start:9,end:10,status:'solo',owner:'titouan',date:''})}}>+ Evenement</button>
           </div>
           {calView==='week'&&(
-            <div className="calgrid">
+            <div className="cal-scroll"><div className="calgrid">
               <div className="calh"></div>
               {DAYS.map((d,i)=><div key={d} className={"calh "+(i===todayIdx?'today':'')}>{d}</div>)}
               {HOURS.map(h=>(
@@ -497,7 +535,7 @@ function App(){
                   ))}
                 </React.Fragment>
               ))}
-            </div>
+            </div></div>
           )}
           {calView==='month'&&(
             <div style={{display:'grid',gridTemplateColumns:'repeat(7,1fr)',gap:1,background:'var(--border)',borderRadius:12,overflow:'hidden',border:'1px solid var(--border)'}}>
