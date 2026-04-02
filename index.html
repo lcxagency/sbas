@@ -155,10 +155,47 @@ select.input{cursor:pointer;-webkit-appearance:none}
 <div class="scan"></div>
 <div id="root"></div>
 <script type="text/babel">
-const{useState,useEffect,useMemo}=React;
+const{useState,useEffect,useMemo,useCallback,useRef}=React;
+
+// === SYNC & PERSISTENCE LAYER ===
+const STORAGE_EVENTS_KEY='sbas_events';
+const STORAGE_TODOS_KEY='sbas_todos';
+const SYNC_CHANNEL_NAME='sbas_sync';
+
+function loadFromStorage(key,fallback){
+  try{const d=localStorage.getItem(key);return d?JSON.parse(d):fallback;}catch(e){return fallback;}
+}
+function saveToStorage(key,data){
+  try{localStorage.setItem(key,JSON.stringify(data));}catch(e){}
+}
+function useSyncedState(key,initial){
+  const[state,setState]=useState(()=>loadFromStorage(key,initial));
+  const bcRef=useRef(null);
+  const ignoreNext=useRef(false);
+  useEffect(()=>{
+    bcRef.current=new BroadcastChannel(SYNC_CHANNEL_NAME);
+    bcRef.current.onmessage=(e)=>{
+      if(e.data&&e.data.key===key){ignoreNext.current=true;setState(e.data.value);}
+    };
+    const onStorage=(e)=>{if(e.key===key&&e.newValue){ignoreNext.current=true;setState(JSON.parse(e.newValue));}};
+    window.addEventListener('storage',onStorage);
+    return()=>{bcRef.current.close();window.removeEventListener('storage',onStorage);};
+  },[key]);
+  const setSynced=useCallback((updater)=>{
+    setState(prev=>{
+      const next=typeof updater==='function'?updater(prev):updater;
+      saveToStorage(key,next);
+      if(!ignoreNext.current&&bcRef.current){bcRef.current.postMessage({key,value:next});}
+      ignoreNext.current=false;
+      return next;
+    });
+  },[key]);
+  return[state,setSynced];
+}
+
 const DAYS=['LUN','MAR','MER','JEU','VEN','SAM','DIM'];
 const FDAYS=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
-const HOURS=Array.from({length:15},(_,i)=>i+7);
+const HOURS=Array.from({length:24},(_,i)=>i);
 const STATUSES=[
   {id:'unavailable',label:'Indisponible',color:'#ff3b3b'},
   {id:'solo',label:'Travail Solo',color:'#00d4ff'},
@@ -234,8 +271,8 @@ function Clock(){
 
 function App(){
   const[tab,setTab]=useState('dashboard');
-  const[events,setEvents]=useState(IE);
-  const[todos,setTodos]=useState(IT);
+  const[events,setEvents]=useSyncedState(STORAGE_EVENTS_KEY,IE);
+  const[todos,setTodos]=useSyncedState(STORAGE_TODOS_KEY,IT);
   const[selUser,setSelUser]=useState('all');
   const[showModal,setShowModal]=useState(null);
   const[selEvent,setSelEvent]=useState(null);
@@ -257,7 +294,7 @@ function App(){
 
   const collabSlots=useMemo(()=>{
     const slots=[];
-    for(let d=0;d<7;d++){for(let h=7;h<21;h++){
+    for(let d=0;d<7;d++){for(let h=0;h<24;h++){
       const tB=events.some(e=>e.owner==='titouan'&&e.day===d&&h>=e.start&&h<e.end);
       const kB=events.some(e=>e.owner==='keda'&&e.day===d&&h>=e.start&&h<e.end);
       if(!tB&&!kB)slots.push({day:d,hour:h});
@@ -281,7 +318,7 @@ function App(){
 
   const addEvent=()=>{
     if(hasConflict(newEv.owner,newEv.day,newEv.start,newEv.end)){alert('CONFLIT - Ce creneau chevauche un evenement existant.');return;}
-    setEvents([...events,{...newEv,id:Date.now()}]);
+    setEvents(prev=>[...prev,{...newEv,id:Date.now()}]);
     setShowModal(null);
     setNewEv({title:'',day:0,start:9,end:10,status:'solo',owner:'titouan',date:''});
   };
@@ -289,16 +326,16 @@ function App(){
   const scheduleTask=()=>{
     if(!schedTodo)return;
     if(hasConflict(schedTodo.owner,schedEv.day,schedEv.start,schedEv.end)){alert('CONFLIT - Creneau deja occupe.');return;}
-    setEvents([...events,{id:Date.now(),day:schedEv.day,start:schedEv.start,end:schedEv.end,title:schedTodo.text,status:schedEv.status,owner:schedTodo.owner,date:''}]);
-    setTodos(todos.map(t=>t.id===schedTodo.id?{...t,scheduled:{day:schedEv.day,start:schedEv.start,end:schedEv.end}}:t));
+    setEvents(prev=>[...prev,{id:Date.now(),day:schedEv.day,start:schedEv.start,end:schedEv.end,title:schedTodo.text,status:schedEv.status,owner:schedTodo.owner,date:''}]);
+    setTodos(prev=>prev.map(t=>t.id===schedTodo.id?{...t,scheduled:{day:schedEv.day,start:schedEv.start,end:schedEv.end}}:t));
     setShowModal(null);setSchedTodo(null);
   };
 
-  const toggleTodo=id=>setTodos(todos.map(t=>t.id===id?{...t,done:!t.done}:t));
+  const toggleTodo=id=>setTodos(prev=>prev.map(t=>t.id===id?{...t,done:!t.done}:t));
   const deleteTodo=id=>{
     const todo=todos.find(t=>t.id===id);
-    if(todo&&todo.scheduled){setEvents(events.filter(e=>!(e.title===todo.text&&e.owner===todo.owner)));}
-    setTodos(todos.filter(t=>t.id!==id));
+    if(todo&&todo.scheduled){setEvents(prev=>prev.filter(e=>!(e.title===todo.text&&e.owner===todo.owner)));}
+    setTodos(prev=>prev.filter(t=>t.id!==id));
   };
   const addTodo=()=>{
     if(!newTodo.trim())return;
@@ -311,11 +348,11 @@ function App(){
       sched={day,start:st,end:en};
       setEvents(ev=>[...ev,{id:tid+1,day,start:st,end:en,title:newTodo,status:'solo',owner:todoView,date:''}]);
     }
-    setTodos([...todos,{id:tid,text:newTodo,done:false,priority:newPri,owner:todoView,project:newProj,scheduled:sched}]);
+    setTodos(prev=>[...prev,{id:tid,text:newTodo,done:false,priority:newPri,owner:todoView,project:newProj,scheduled:sched}]);
     setNewTodo('');setNewTodoDay('');setNewTodoStart('');setNewTodoEnd('');
   };
   const openSchedule=(todo)=>{setSchedTodo(todo);setSchedEv({day:2,start:9,end:10,status:'solo'});setShowModal('schedule');};
-  const deleteEvent=(id)=>{setEvents(events.filter(e=>e.id!==id));setSelEvent(null);setShowModal(null);};
+  const deleteEvent=(id)=>{setEvents(prev=>prev.filter(e=>e.id!==id));setSelEvent(null);setShowModal(null);};
   const openEventDetail=(ev)=>{setSelEvent(ev);setShowModal('detail');};
 
   const curTodos=todos.filter(t=>t.owner===todoView);
