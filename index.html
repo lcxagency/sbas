@@ -128,6 +128,11 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tex
 .todo-btn.sched:hover{color:var(--sc);border-color:rgba(0,255,136,.3)}
 .todo-btn.del:hover{color:var(--su);border-color:rgba(255,59,59,.3)}
 .todo-item.overdue{border-color:rgba(255,59,59,.5);background:rgba(255,59,59,.04);animation:pulse 2s ease infinite}
+.todo-item.dragging{opacity:.4;border-color:var(--ss)}
+.todo-item.drag-over{border-color:var(--ss);box-shadow:0 -2px 0 var(--ss)}
+.drag-grip{cursor:grab;color:var(--text-muted);font-size:14px;letter-spacing:-2px;padding:0 4px;user-select:none;flex-shrink:0;display:flex;align-items:center}
+.drag-grip:active{cursor:grabbing}
+.todo-text{cursor:text}
 .subtasks-list{margin-top:8px;padding-left:10px;border-left:2px solid var(--border)}
 .subtask-item{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px}
 .subtask-check{width:14px;height:14px;border-radius:3px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0}
@@ -348,6 +353,8 @@ function App(){
   const[todoView,setTodoView]=useState('titouan');
   const[editingTodo,setEditingTodo]=useState(null);
   const[editText,setEditText]=useState('');
+  const[dragId,setDragId]=useState(null);
+  const[dragOverId,setDragOverId]=useState(null);
   const[expandedTodo,setExpandedTodo]=useState(null);
   const[newSubtext,setNewSubtext]=useState('');
   const[notifs,setNotifs]=useSyncedState('sbas_notifs',[]);
@@ -418,7 +425,10 @@ function App(){
   const openSchedule=(todo)=>{setSchedTodo(todo);setSchedEv({day:2,start:9,end:10,status:'solo'});setShowModal('schedule');};
   const startEdit=(t)=>{setEditingTodo(t.id);setEditText(t.text);};
   const saveEdit=(id)=>{if(editText.trim()){setTodos(prev=>prev.map(t=>t.id===id?{...t,text:editText}:t));}setEditingTodo(null);};
-  const moveTodo=(id,dir)=>{setTodos(prev=>{const ownerTodos=prev.filter(t=>t.owner===todoView&&!t.done);const otherTodos=prev.filter(t=>t.owner!==todoView||t.done);const idx=ownerTodos.findIndex(t=>t.id===id);if(idx<0||(dir===-1&&idx===0)||(dir===1&&idx===ownerTodos.length-1))return prev;const arr=[...ownerTodos];[arr[idx],arr[idx+dir]]=[arr[idx+dir],arr[idx]];return[...arr,...otherTodos];});};
+  const onDragStart=(e,id)=>{setDragId(id);e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',id);};
+  const onDragOver=(e,id)=>{e.preventDefault();e.dataTransfer.dropEffect='move';if(id!==dragOverId)setDragOverId(id);};
+  const onDragEnd=()=>{setDragId(null);setDragOverId(null);};
+  const onDrop=(e,targetId)=>{e.preventDefault();if(!dragId||dragId===targetId)return onDragEnd();setTodos(prev=>{const ownerTodos=prev.filter(t=>t.owner===todoView&&!t.done);const otherTodos=prev.filter(t=>t.owner!==todoView||t.done);const fromIdx=ownerTodos.findIndex(t=>t.id===dragId);const toIdx=ownerTodos.findIndex(t=>t.id===targetId);if(fromIdx<0||toIdx<0)return prev;const arr=[...ownerTodos];const[moved]=arr.splice(fromIdx,1);arr.splice(toIdx,0,moved);return[...arr,...otherTodos];});onDragEnd();};
   const toggleExpand=(id)=>setExpandedTodo(prev=>prev===id?null:id);
   const addSubtask=(todoId,text)=>{if(!text.trim())return;setTodos(prev=>prev.map(t=>t.id===todoId?{...t,subtasks:[...(t.subtasks||[]),{id:Date.now(),text,done:false}]}:t));};
   const toggleSubtask=(todoId,subId)=>setTodos(prev=>prev.map(t=>t.id===todoId?{...t,subtasks:(t.subtasks||[]).map(s=>s.id===subId?{...s,done:!s.done}:s)}:t));
@@ -633,18 +643,19 @@ function App(){
           {activeTodos.length===0&&<div style={{textAlign:'center',padding:40,color:'var(--text-muted)',fontSize:13}}>Aucune tache active pour {todoView==='titouan'?'Titouan':'Keda'}</div>}
 
           {activeTodos.map(t=>(
-            <div key={t.id} className={"todo-item"+(isOverdue(t)?" overdue":"")}>
+            <div key={t.id} className={"todo-item"+(isOverdue(t)?" overdue":"")+(dragId===t.id?" dragging":"")+(dragOverId===t.id&&dragId!==t.id?" drag-over":"")} draggable={editingTodo!==t.id} onDragStart={e=>onDragStart(e,t.id)} onDragOver={e=>onDragOver(e,t.id)} onDragEnd={onDragEnd} onDrop={e=>onDrop(e,t.id)}>
+              <div className="drag-grip" title="Glisser pour deplacer">⠗</div>
               <div className="todo-check" onClick={()=>toggleTodo(t.id)}></div>
               <div className="todo-body">
                 {editingTodo===t.id?(
                   <input className="input" style={{flex:1,marginBottom:6}} value={editText} onChange={e=>setEditText(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')saveEdit(t.id);if(e.key==='Escape')setEditingTodo(null);}} onBlur={()=>saveEdit(t.id)} autoFocus/>
                 ):(
-                  <div className="todo-text">{t.text}</div>
+                  <div className="todo-text" onClick={()=>startEdit(t)}>{t.text}</div>
                 )}
                 <div className="todo-meta">
                   <span className={"todo-tag "+t.priority}>{t.priority}</span>
                   <span className="todo-tag proj">{t.project}</span>
-                  {t.scheduled&&<span style={{fontSize:8,color:'var(--sc)'}}>&#128197; {FDAYS[t.scheduled.day]} {fmtTime(t.scheduled.start)}—{fmtTime(t.scheduled.end)}</span>}
+                  {t.scheduled&&<span style={{fontSize:8,color:'var(--sc)'}}>&#128197; {FDAYS[t.scheduled.day]} {fmtTime(t.scheduled.start)}&mdash;{fmtTime(t.scheduled.end)}</span>}
                   {isOverdue(t)&&<span style={{fontSize:8,color:'var(--su)',fontWeight:600}}>EN RETARD</span>}
                 </div>
                 {expandedTodo===t.id&&(
@@ -664,9 +675,6 @@ function App(){
                 )}
               </div>
               <div className="todo-actions">
-                <button className="todo-btn" title="Editer" onClick={()=>startEdit(t)}>✎</button>
-                <button className="todo-btn" title="Haut" onClick={()=>moveTodo(t.id,-1)}>▲</button>
-                <button className="todo-btn" title="Bas" onClick={()=>moveTodo(t.id,1)}>▼</button>
                 <button className="todo-btn" title="Sous-taches" onClick={()=>toggleExpand(t.id)}>{expandedTodo===t.id?'▾':'▸'}</button>
                 <button className="todo-btn sched" title="Planifier" onClick={()=>openSchedule(t)}>&#128197;</button>
                 <button className="todo-btn del" title="Supprimer" onClick={()=>deleteTodo(t.id)}>&times;</button>
