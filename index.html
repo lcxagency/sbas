@@ -13,6 +13,20 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyDb0QLOg85Cm3jpB_RMaU4lPWVGwDp00t8",
+  authDomain:"lcx-sbas.firebaseapp.com",
+  databaseURL:"https://lcx-sbas-default-rtdb.firebaseio.com",
+  projectId:"lcx-sbas",
+  storageBucket:"lcx-sbas.firebasestorage.app",
+  messagingSenderId:"83147623408",
+  appId:"1:83147623408:web:600644aa88f205e1c22b35"
+});
+const fbDb=firebase.database();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#050505;--bg2:#0c0c0c;--bg3:#141414;--bg4:#1c1c1c;--border:#1e1e1e;--border-glow:#333;--text:#eaeaea;--text-dim:#777;--text-muted:#444;--accent:#fff;--su:#ff3b3b;--ss:#00d4ff;--sc:#00ff88;--se:#ff8800;--scr:#b84dff}
@@ -157,36 +171,32 @@ select.input{cursor:pointer;-webkit-appearance:none}
 <script type="text/babel">
 const{useState,useEffect,useMemo,useCallback,useRef}=React;
 
-// === SYNC & PERSISTENCE LAYER ===
+// === FIREBASE SYNC LAYER ===
 const STORAGE_EVENTS_KEY='sbas_events';
 const STORAGE_TODOS_KEY='sbas_todos';
-const SYNC_CHANNEL_NAME='sbas_sync';
 
-function loadFromStorage(key,fallback){
-  try{const d=localStorage.getItem(key);return d?JSON.parse(d):fallback;}catch(e){return fallback;}
-}
-function saveToStorage(key,data){
-  try{localStorage.setItem(key,JSON.stringify(data));}catch(e){}
-}
 function useSyncedState(key,initial){
-  const[state,setState]=useState(()=>loadFromStorage(key,initial));
-  const bcRef=useRef(null);
-  const ignoreNext=useRef(false);
+  const[state,setState]=useState(initial);
+  const localRef=useRef(false);
+  const initialized=useRef(false);
   useEffect(()=>{
-    bcRef.current=new BroadcastChannel(SYNC_CHANNEL_NAME);
-    bcRef.current.onmessage=(e)=>{
-      if(e.data&&e.data.key===key){ignoreNext.current=true;setState(e.data.value);}
-    };
-    const onStorage=(e)=>{if(e.key===key&&e.newValue){ignoreNext.current=true;setState(JSON.parse(e.newValue));}};
-    window.addEventListener('storage',onStorage);
-    return()=>{bcRef.current.close();window.removeEventListener('storage',onStorage);};
+    const ref=fbDb.ref(key);
+    ref.on('value',(snap)=>{
+      const val=snap.val();
+      if(val!==null){
+        setState(val);
+      }else if(!initialized.current){
+        // First time: seed Firebase with initial data
+        ref.set(initial);
+      }
+      initialized.current=true;
+    });
+    return()=>ref.off('value');
   },[key]);
   const setSynced=useCallback((updater)=>{
     setState(prev=>{
       const next=typeof updater==='function'?updater(prev):updater;
-      saveToStorage(key,next);
-      if(!ignoreNext.current&&bcRef.current){bcRef.current.postMessage({key,value:next});}
-      ignoreNext.current=false;
+      fbDb.ref(key).set(next);
       return next;
     });
   },[key]);
