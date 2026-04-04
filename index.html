@@ -218,6 +218,89 @@ select.input{cursor:pointer;-webkit-appearance:none}
 }
 .cal-scroll{overflow:visible}
 .tab-c{animation:fadeIn .35s ease}
+
+/* === OUTREACH SNIPER === */
+.or-flow{display:flex;align-items:center;gap:2px;margin-bottom:20px;overflow-x:auto;padding-bottom:4px}
+.or-flow::-webkit-scrollbar{display:none}
+.or-fstep{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);cursor:pointer;border:1px solid transparent;background:transparent;transition:all .2s;white-space:nowrap}
+.or-fstep:hover{color:var(--text-dim);border-color:var(--border)}
+.or-fstep.active{color:var(--accent);background:var(--bg3);border-color:var(--border-glow)}
+.or-fstep.done{color:var(--sc);border-color:rgba(0,255,136,.15);background:rgba(0,255,136,.04)}
+.or-fstep .fnum{width:16px;height:16px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;background:var(--bg4);border:1px solid var(--border)}
+.or-fstep.active .fnum{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+.or-fstep.done .fnum{background:var(--sc);color:var(--bg);border-color:var(--sc)}
+.or-arrow{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-muted);margin:0 1px}
+.or-name{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;margin-bottom:16px}
+.or-name label{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:1px;color:var(--text-dim);text-transform:uppercase;white-space:nowrap}
+.or-name input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;color:var(--accent);font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:600;outline:none;transition:border-color .2s}
+.or-name input:focus{border-color:var(--border-glow)}
+.or-name input::placeholder{color:var(--text-muted)}
+.or-sh{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--text-dim);margin-bottom:3px}
+.or-sd{font-size:11px;color:var(--text-muted);margin-bottom:14px}
+.or-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.or-chk{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:all .2s;position:relative}
+.or-chk:hover{border-color:var(--border-glow)}
+.or-chk.checked{border-color:var(--sc);background:rgba(0,255,136,.03)}
+.or-chk.checked::after{content:'\2713';position:absolute;top:10px;right:12px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--sc)}
+.or-chk .or-tag{font-family:'JetBrains Mono',monospace;font-size:7px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;display:inline-block;padding:2px 7px;border-radius:4px;margin-bottom:6px}
+.or-tag.tr{color:var(--su);background:rgba(255,59,59,.08);border:1px solid rgba(255,59,59,.12)}
+.or-tag.to{color:var(--se);background:rgba(255,136,0,.08);border:1px solid rgba(255,136,0,.12)}
+.or-tag.tb{color:var(--ss);background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.12)}
+.or-chk h4{font-size:12px;font-weight:700;color:var(--text);margin-bottom:3px}
+.or-chk p{font-size:10px;color:var(--text-dim);line-height:1.5}
+.or-chk textarea{width:100%;margin-top:10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:10px;resize:vertical;min-height:38px;outline:none;transition:border-color .2s}
+.or-chk textarea:focus{border-color:var(--border-glow)}
+.or-chk textarea::placeholder{color:var(--text-muted)}
+.or-statbar{display:flex;align-items:center;gap:14px;padding:8px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text-dim);letter-spacing:.5px}
+.or-statbar .val{color:var(--sc);font-weight:700}
+.or-bloc{background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:all .2s;margin-bottom:6px}
+.or-bloc.sel{border-color:var(--ss);background:rgba(0,212,255,.03)}
+.or-bhead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;transition:background .15s}
+.or-bhead:hover{background:var(--bg4)}
+.or-bhead-l{display:flex;align-items:center;gap:10px}
+.or-bicon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;background:var(--bg4);border:1px solid var(--border)}
+.or-bloc.sel .or-bicon{border-color:var(--ss);background:rgba(0,212,255,.08)}
+.or-bhead-l h4{font-size:11px;font-weight:700;color:var(--text)}
+.or-bhead-l .or-bsub{font-size:9px;color:var(--text-muted);margin-top:1px}
+.or-btog{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);background:none;border:1px solid var(--border);width:22px;height:22px;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.or-bloc.sel .or-btog{border-color:var(--ss);color:var(--ss)}
+.or-bbody{display:none;padding:0 16px 14px}
+.or-bloc.sel .or-bbody{display:block}
+.or-tpl{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;position:relative}
+.or-tpl-lbl{font-family:'JetBrains Mono',monospace;font-size:7px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px}
+.or-tpl-msg{font-size:11px;color:var(--text-dim);line-height:1.7;white-space:pre-wrap}
+.or-tpl-msg .v{color:var(--ss);font-weight:600}
+.or-copy{position:absolute;top:8px;right:8px;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;letter-spacing:1px;text-transform:uppercase;background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:3px 8px;color:var(--text-dim);cursor:pointer;transition:all .2s}
+.or-copy:hover{border-color:var(--border-glow);color:var(--text)}
+.or-copy.ok{background:var(--sc);color:var(--bg);border-color:var(--sc)}
+.or-free{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
+.or-free h4{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text);margin-bottom:3px}
+.or-free .hint{font-size:10px;color:var(--text-muted);margin-bottom:12px}
+.or-free textarea{width:100%;min-height:100px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:11px;line-height:1.7;resize:vertical;outline:none;transition:border-color .2s}
+.or-free textarea:focus{border-color:var(--border-glow)}
+.or-free textarea::placeholder{color:var(--text-muted)}
+.or-cc{text-align:right;font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text-muted);margin-top:4px;letter-spacing:.5px}
+.or-tips{background:var(--bg3);border:1px solid rgba(255,136,0,.12);border-radius:10px;padding:14px 16px;margin-bottom:16px}
+.or-tips h4{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--se);margin-bottom:8px}
+.or-tips p{font-size:10px;color:var(--text-dim);line-height:1.8}
+.or-close{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px}
+.or-close h4{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text);margin-bottom:3px}
+.or-close .hint{font-size:10px;color:var(--text-muted);margin-bottom:12px}
+.or-close input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--accent);font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:500;outline:none;transition:border-color .2s}
+.or-close input:focus{border-color:var(--border-glow)}
+.or-close input::placeholder{color:var(--text-muted)}
+.or-final{background:var(--bg3);border:1px solid var(--sc);border-radius:10px;padding:16px;margin-bottom:16px}
+.or-final .fl{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--sc);margin-bottom:3px}
+.or-final .fs{font-size:10px;color:var(--text-muted);margin-bottom:12px}
+.or-fmsg{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;color:var(--text);font-size:11px;line-height:1.8;white-space:pre-wrap;min-height:60px}
+.or-fmsg .ph{color:var(--text-muted)}
+.or-nav{display:flex;justify-content:space-between;margin-top:20px;padding-top:14px;border-top:1px solid var(--border)}
+.or-nav .rr{display:flex;gap:6px}
+@media(max-width:900px){
+  .or-grid{grid-template-columns:1fr}
+  .or-flow{gap:1px}
+  .or-fstep{padding:5px 8px;font-size:8px}
+}
 </style>
 </head>
 <body>
@@ -366,6 +449,45 @@ function App(){
   const[expandedTodo,setExpandedTodo]=useState(null);
   const[newSubtext,setNewSubtext]=useState('');
   const[notifs,setNotifs]=useSyncedState('sbas_notifs',[]);
+
+  // OUTREACH STATE
+  const[orStep,setOrStep]=useState(0);
+  const[orName,setOrName]=useState('');
+  const[orChecks,setOrChecks]=useState([false,false,false,false]);
+  const[orNotes,setOrNotes]=useState(['','','','']);
+  const[orBlocs,setOrBlocs]=useState([false,false,false,false]);
+  const[orFree,setOrFree]=useState('');
+  const[orClose,setOrClose]=useState('');
+  const orTemplates=[
+    `[Name], is it just me or is the algorithm doing you dirty? Your reach has dropped significantly on your latest reels. Are you sure your team is managing multiple accounts for you in the backend or are they simply falling short?`,
+    `Hey [Name], u should try running only the OF link in Linkme for a bit. We 10x'd the click rate for another model doing that. Would love to send a quick video of some easy improvements for your setup if u want? Just drop a yes`,
+    `[Name] be careful with the Amazon wishlist you put in your OF bio coz Amazon is now revealing your address to anyone buying you something!\nAlso i saw a few points you could improve on your IG/OF setup, do you want me to make a quick vid to show you?`,
+    `Hey [Name], not gonna hit you with some copy paste pitch. I looked at your page and I think you could be making way more with your fanbase. I put together a quick video showing what I'd change on your setup, wanna see it? Just say ok`
+  ];
+  const orGoStep=(s)=>{setOrStep(s);};
+  const orToggleCheck=(i)=>{setOrChecks(p=>{const n=[...p];n[i]=!n[i];return n;});};
+  const orToggleBloc=(i)=>{setOrBlocs(p=>{const n=[...p];n[i]=!n[i];return n;});};
+  const orSetNote=(i,v)=>{setOrNotes(p=>{const n=[...p];n[i]=v;return n;});};
+  const orCopyTpl=(i,btn)=>{
+    const name=orName||'[Name]';
+    const t=orTemplates[i].replace(/\[Name\]/g,name);
+    navigator.clipboard.writeText(t).then(()=>{btn.textContent='\u2713';btn.classList.add('ok');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('ok')},1200);});
+  };
+  const orBuildFinal=()=>{
+    const name=orName||'[Name]';
+    let parts=[];
+    orBlocs.forEach((sel,i)=>{if(sel)parts.push(orTemplates[i].replace(/\[Name\]/g,name));});
+    if(orFree.trim())parts.push(orFree.trim());
+    if(orClose)parts.push(orClose);
+    return parts.length?parts.join('\n\n'):'';
+  };
+  const orCopyFinal=()=>{
+    const t=orBuildFinal();
+    if(!t)return;
+    navigator.clipboard.writeText(t);
+  };
+  const orReset=()=>{setOrStep(0);setOrName('');setOrChecks([false,false,false,false]);setOrNotes(['','','','']);setOrBlocs([false,false,false,false]);setOrFree('');setOrClose('');};
+
   const[theme,setTheme]=useState(()=>{try{return localStorage.getItem('sbas_theme')||'dark'}catch(e){return'dark'}});
   useEffect(()=>{document.documentElement.setAttribute('data-theme',theme);try{localStorage.setItem('sbas_theme',theme)}catch(e){}},[theme]);
   const toggleTheme=()=>setTheme(prev=>prev==='dark'?'light':'dark');
@@ -489,7 +611,7 @@ function App(){
     ))}
 
     <div className="nav">
-      {[{id:'dashboard',l:'Dashboard'},{id:'calendar',l:'Calendrier'},{id:'todos',l:'Taches'},{id:'collab',l:'Collaboration'}].map(n=>(
+      {[{id:'dashboard',l:'Dashboard'},{id:'calendar',l:'Calendrier'},{id:'todos',l:'Taches'},{id:'collab',l:'Collaboration'},{id:'outreach',l:'Outreach'}].map(n=>(
         <button key={n.id} className={"nav-btn "+(tab===n.id?'active':'')} onClick={()=>setTab(n.id)}>{n.l}</button>
       ))}
     </div>
@@ -719,6 +841,143 @@ function App(){
               return(<div key={w} className="tr-row"><span className="tr-lbl">{w}</span><div className="tr-bg"><div className="tr-fill" style={{width:hrs*12+'%',background:'var(--sc)'}}></div></div><span className="tr-val">{hrs}h</span></div>);
             })}
           </div>
+        </div>)}
+
+        {tab==='outreach'&&(
+        <div className="tab-c">
+
+          {/* FLOW NAV */}
+          <div className="or-flow">
+            {['Diagnostic','Blocs','Freestyle','Close','Send'].map((label,i)=>(
+              <React.Fragment key={i}>
+                {i>0&&<span className="or-arrow">&rarr;</span>}
+                <div className={"or-fstep"+(orStep===i?' active':'')+(orStep>i?' done':'')} onClick={()=>orGoStep(i)}>
+                  <span className="fnum">{i+1}</span>{label}
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
+
+          {/* STEP 0: DIAGNOSTIC */}
+          {orStep===0&&(<div style={{animation:'fadeIn .25s ease'}}>
+            <div className="or-name">
+              <label>Target @</label>
+              <input placeholder="name or @handle" value={orName} onChange={e=>setOrName(e.target.value)}/>
+            </div>
+            <div className="or-sh">Phase 01 — Diagnostic</div>
+            <div className="or-sd">Scan the account. Check every point. Note observations.</div>
+            <div className="or-grid">
+              {[
+                {tag:'tr',tagL:'High Impact',title:'Reach Check',desc:'Compare latest Reels vs older ones. Visible view drop? Algorithm penalty?',ph:'Notes: views before vs now, trend...'},
+                {tag:'to',tagL:'Quick Lever',title:'Funnel Check',desc:'LinkMe used? OF link alone or buried among others? Traffic leaks detected?',ph:'Notes: number of links, LinkMe structure...'},
+                {tag:'tr',tagL:'Security Alert',title:'Wishlist Check',desc:'Amazon Wishlist in OF bio or LinkMe? Personal address exposure risk.',ph:'Notes: wishlist found? where exactly...'},
+                {tag:'tb',tagL:'Differentiation',title:'Visual Audit',desc:'IG/OF consistency, feed quality, optimized bio, highlights, overall branding.',ph:'Notes: what stands out, quick wins...'}
+              ].map((c,i)=>(
+                <div key={i} className={"or-chk"+(orChecks[i]?' checked':'')} onClick={()=>orToggleCheck(i)}>
+                  <div className={"or-tag "+c.tag}>{c.tagL}</div>
+                  <h4>{c.title}</h4>
+                  <p>{c.desc}</p>
+                  <textarea placeholder={c.ph} value={orNotes[i]} onClick={e=>e.stopPropagation()} onChange={e=>orSetNote(i,e.target.value)}/>
+                </div>
+              ))}
+            </div>
+            <div className="or-statbar">Checks completed: <span className="val">{orChecks.filter(Boolean).length}</span>/4</div>
+            <div className="or-nav"><div></div><button className="btn btn-pr" onClick={()=>orGoStep(1)}>Choose Blocs &rarr;</button></div>
+          </div>)}
+
+          {/* STEP 1: BLOCS */}
+          {orStep===1&&(<div style={{animation:'fadeIn .25s ease'}}>
+            <div className="or-sh">Phase 02 — Message Builder</div>
+            <div className="or-sd">Select the blocs that match your diagnostic. Combine for a unique DM.</div>
+            {[
+              {icon:'📉',title:'Reach / Algorithm',sub:'When you detect a view drop'},
+              {icon:'🔗',title:'Funnel / LinkMe',sub:'When the OF link is buried or unoptimized'},
+              {icon:'📦',title:'Wishlist / Security',sub:'When you spot an Amazon Wishlist'},
+              {icon:'👁️',title:'Image Consistency',sub:'General approach based on visual audit'}
+            ].map((b,i)=>(
+              <div key={i} className={"or-bloc"+(orBlocs[i]?' sel':'')} >
+                <div className="or-bhead" onClick={()=>orToggleBloc(i)}>
+                  <div className="or-bhead-l">
+                    <div className="or-bicon">{b.icon}</div>
+                    <div><h4>{b.title}</h4><div className="or-bsub">{b.sub}</div></div>
+                  </div>
+                  <button className="or-btog">{orBlocs[i]?'−':'+'}</button>
+                </div>
+                {orBlocs[i]&&(
+                  <div className="or-bbody" style={{display:'block'}}>
+                    <div className="or-tpl">
+                      <div className="or-tpl-lbl">Template</div>
+                      <button className="or-copy" onClick={e=>{e.stopPropagation();orCopyTpl(i,e.target);}}>Copy</button>
+                      <div className="or-tpl-msg" dangerouslySetInnerHTML={{__html:orTemplates[i].replace(/\[Name\]/g,'<span class="v">'+(orName||'[Name]')+'</span>').replace(/\n/g,'<br/>')}}/>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+            <div className="or-nav">
+              <button className="btn" onClick={()=>orGoStep(0)}>&larr; Diagnostic</button>
+              <div className="rr"><button className="btn" onClick={()=>orGoStep(2)}>Freestyle &rarr;</button><button className="btn btn-pr" onClick={()=>orGoStep(3)}>Skip to Close &rarr;</button></div>
+            </div>
+          </div>)}
+
+          {/* STEP 2: FREESTYLE */}
+          {orStep===2&&(<div style={{animation:'fadeIn .25s ease'}}>
+            <div className="or-sh">Phase 03 — Creative Flow</div>
+            <div className="or-sd">Spotted something unique? Write your message from scratch here.</div>
+            <div className="or-free">
+              <h4>Freestyle Zone</h4>
+              <p className="hint">Structure: specific observation → value add → closed question.</p>
+              <textarea placeholder={"e.g. Hey "+(orName||'[Name]')+", I noticed you post a lot of behind-the-scenes but don't highlight them — that's exactly the type of content that converts on OF..."} value={orFree} onChange={e=>setOrFree(e.target.value)}/>
+              <div className="or-cc">{orFree.length} chars</div>
+            </div>
+            <div className="or-tips">
+              <h4>Freestyle Reminders</h4>
+              <p>→ Mention a SPECIFIC detail from the account (a Reel, a highlight, a post)<br/>
+              → Show you spent time looking (not just skimmed)<br/>
+              → Offer concrete value (audit video, actionable tip)<br/>
+              → ALWAYS end with a closed question</p>
+            </div>
+            <div className="or-nav">
+              <button className="btn" onClick={()=>orGoStep(1)}>&larr; Blocs</button>
+              <button className="btn btn-pr" onClick={()=>orGoStep(3)}>Choose Closer &rarr;</button>
+            </div>
+          </div>)}
+
+          {/* STEP 3: CLOSE */}
+          {orStep===3&&(<div style={{animation:'fadeIn .25s ease'}}>
+            <div className="or-sh">Phase 04 — Punch Final</div>
+            <div className="or-sd">Write the closing question that forces a response.</div>
+            <div className="or-close">
+              <h4>Your Closing Question</h4>
+              <p className="hint">Short, direct, easy to answer. Yes/no or one-word answers only.</p>
+              <input placeholder="e.g. Wanna see it? / You handle all this solo? / Want me to send the free audit?" value={orClose} onChange={e=>setOrClose(e.target.value)}/>
+            </div>
+            <div className="or-nav">
+              <button className="btn" onClick={()=>orGoStep(1)}>&larr; Blocs</button>
+              <button className="btn btn-pr" onClick={()=>orGoStep(4)}>See Final Message &rarr;</button>
+            </div>
+          </div>)}
+
+          {/* STEP 4: SEND */}
+          {orStep===4&&(<div style={{animation:'fadeIn .25s ease'}}>
+            <div className="or-sh">Phase 05 — Ready to Send</div>
+            <div className="or-sd">Review, adjust if needed, copy and send.</div>
+            <div className="or-final">
+              <div className="fl">Assembled DM</div>
+              <div className="fs">Your blocs + closing question combined.</div>
+              <div className="or-fmsg">{orBuildFinal()||<span className="ph">Go back to previous steps to build your message...</span>}</div>
+              <div style={{display:'flex',gap:6,marginTop:14,flexWrap:'wrap'}}>
+                <button className="btn btn-pr" onClick={orCopyFinal}>Copy Message</button>
+                <button className="btn" onClick={()=>orGoStep(0)}>New Prospect</button>
+                <button className="btn" style={{color:'var(--su)',borderColor:'rgba(255,59,59,.25)'}} onClick={orReset}>Reset All</button>
+              </div>
+            </div>
+            <div className="or-nav">
+              <button className="btn" onClick={()=>orGoStep(3)}>&larr; Edit</button>
+              <div></div>
+            </div>
+          </div>)}
+
         </div>)}
 
       </div>
