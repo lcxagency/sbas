@@ -354,6 +354,7 @@ function App(){
   const[newTodoStart,setNewTodoStart]=useState('');
   const[newTodoEnd,setNewTodoEnd]=useState('');
   const[newRecur,setNewRecur]=useState('none');
+  const[showAddTodo,setShowAddTodo]=useState(false);
   const[calView,setCalView]=useState('week');
   const[showPwa,setShowPwa]=useState(true);
   const[sidebarOpen,setSidebarOpen]=useState(false);
@@ -620,35 +621,7 @@ function App(){
             </div>
           </div>
 
-          <div className="add-bar">
-            <input className="input" style={{flex:1,minWidth:180}} placeholder={"Nouvelle tache pour "+(todoView==='titouan'?'Titouan':'Keda')+"..."} value={newTodo} onChange={e=>setNewTodo(e.target.value)} onKeyDown={e=>e.key==='Enter'&&addTodo()}/>
-            <select className="input" style={{width:90}} value={newPri} onChange={e=>setNewPri(e.target.value)}>
-              <option value="high">Haute</option><option value="medium">Moyenne</option><option value="low">Basse</option>
-            </select>
-            <input className="input" style={{width:100}} placeholder="Projet..." value={newProj} onChange={e=>setNewProj(e.target.value)}/>
-            <select className="input" style={{width:100}} value={newRecur} onChange={e=>setNewRecur(e.target.value)}>
-              <option value="none">Unique</option><option value="daily">Quotidien</option><option value="weekly">Hebdo</option><option value="monthly">Mensuel</option>
-            </select>
-            <button className="btn btn-pr" onClick={addTodo}>+</button>
-          </div>
-          <div className="add-bar" style={{opacity:newTodo.trim()?1:.4,transition:'opacity .3s'}}>
-            <span style={{fontSize:9,color:'var(--text-muted)',letterSpacing:1,textTransform:'uppercase',alignSelf:'center',marginRight:4}}>Planifier (optionnel) :</span>
-            <select className="input" style={{width:110}} value={newTodoDay} onChange={e=>setNewTodoDay(e.target.value)}>
-              <option value="">-- Jour --</option>
-              {FDAYS.map((d,i)=><option key={i} value={i}>{d}</option>)}
-            </select>
-            <select className="input" style={{width:85}} value={newTodoStart} onChange={e=>setNewTodoStart(e.target.value)}>
-              <option value="">Debut</option>
-              {TIMES.map(t=><option key={t.val} value={t.val}>{t.label}</option>)}
-            </select>
-            <select className="input" style={{width:85}} value={newTodoEnd} onChange={e=>setNewTodoEnd(e.target.value)}>
-              <option value="">Fin</option>
-              {TIMES.map(t=><option key={t.val} value={t.val}>{t.label}</option>)}
-            </select>
-            {newTodoDay!==''&&newTodoStart!==''&&newTodoEnd!==''&&(
-              <span style={{fontSize:9,color:'var(--sc)',alignSelf:'center'}}>&#10003; Sera ajoutee au calendrier</span>
-            )}
-          </div>
+          <button className="btn btn-pr" style={{width:'100%',marginBottom:16,padding:'10px 0'}} onClick={()=>setShowAddTodo(true)}>+ Nouvelle tache</button>
 
           {activeTodos.length===0&&<div style={{textAlign:'center',padding:40,color:'var(--text-muted)',fontSize:13}}>Aucune tache active pour {todoView==='titouan'?'Titouan':'Keda'}</div>}
 
@@ -849,6 +822,59 @@ function App(){
         <div className="mactions">
           <button className="btn" onClick={()=>{setShowModal(null);setSelEvent(null)}}>Fermer</button>
           <button className="btn" style={{borderColor:'rgba(255,59,59,.4)',color:'#ff3b3b'}} onClick={()=>deleteEvent(selEvent.id)}>Supprimer</button>
+        </div>
+      </div>
+    </div>)}
+
+    {/* MODAL: ADD TODO */}
+    {showAddTodo&&(
+    <div className="moverlay" onClick={()=>setShowAddTodo(false)}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <div className="modal-title">Nouvelle tache &mdash; {todoView==='titouan'?'Titouan':'Keda'}</div>
+        <div className="mrow"><div className="mlbl">Intitule</div>
+          <input className="input" style={{width:'100%'}} placeholder="Ex: Envoyer le devis client..." value={newTodo} onChange={e=>setNewTodo(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&newTodo.trim()){addTodo();setShowAddTodo(false);}}} autoFocus/>
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+          <div className="mrow"><div className="mlbl">Priorite</div>
+            <select className="input" style={{width:'100%'}} value={newPri} onChange={e=>setNewPri(e.target.value)}>
+              <option value="high">Haute</option><option value="medium">Moyenne</option><option value="low">Basse</option>
+            </select>
+          </div>
+          <div className="mrow"><div className="mlbl">Projet</div>
+            <input className="input" style={{width:'100%'}} placeholder="General" value={newProj} onChange={e=>setNewProj(e.target.value)}/>
+          </div>
+          <div className="mrow"><div className="mlbl">Recurrence</div>
+            <select className="input" style={{width:'100%'}} value={newRecur} onChange={e=>setNewRecur(e.target.value)}>
+              <option value="none">Unique</option><option value="daily">Quotidien</option><option value="weekly">Hebdomadaire</option><option value="monthly">Mensuel</option>
+            </select>
+          </div>
+          <div className="mrow"><div className="mlbl">Jour (optionnel)</div>
+            <select className="input" style={{width:'100%'}} value={newTodoDay} onChange={e=>setNewTodoDay(e.target.value)}>
+              <option value="">-- Aucun --</option>
+              {FDAYS.map((d,i)=><option key={i} value={i}>{d}</option>)}
+            </select>
+          </div>
+          {newTodoDay!==''&&(<>
+          <div className="mrow"><div className="mlbl">Debut</div>
+            <select className="input" style={{width:'100%'}} value={newTodoStart} onChange={e=>setNewTodoStart(e.target.value)}>
+              <option value="">--</option>
+              {TIMES.map(t=><option key={t.val} value={t.val}>{t.label}</option>)}
+            </select>
+          </div>
+          <div className="mrow"><div className="mlbl">Fin</div>
+            <select className="input" style={{width:'100%'}} value={newTodoEnd} onChange={e=>setNewTodoEnd(e.target.value)}>
+              <option value="">--</option>
+              {TIMES.map(t=><option key={t.val} value={t.val}>{t.label}</option>)}
+            </select>
+          </div>
+          </>)}
+        </div>
+        {newTodoDay!==''&&newTodoStart!==''&&newTodoEnd!==''&&(
+          <div className="alert alert-ok" style={{marginTop:8}}><span>&#10003;</span> Sera ajoutee au calendrier</div>
+        )}
+        <div className="mactions">
+          <button className="btn" onClick={()=>setShowAddTodo(false)}>Annuler</button>
+          <button className="btn btn-pr" onClick={()=>{if(newTodo.trim()){addTodo();setShowAddTodo(false);}}}>Ajouter</button>
         </div>
       </div>
     </div>)}
