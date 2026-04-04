@@ -30,20 +30,26 @@ const fbDb=firebase.database();
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#050505;--bg2:#0c0c0c;--bg3:#141414;--bg4:#1c1c1c;--border:#1e1e1e;--border-glow:#333;--text:#eaeaea;--text-dim:#777;--text-muted:#444;--accent:#fff;--su:#ff3b3b;--ss:#00d4ff;--sc:#00ff88;--se:#ff8800;--scr:#b84dff}
+:root,[data-theme="dark"]{--bg:#050505;--bg2:#0c0c0c;--bg3:#141414;--bg4:#1c1c1c;--border:#1e1e1e;--border-glow:#333;--text:#eaeaea;--text-dim:#777;--text-muted:#444;--accent:#fff;--su:#ff3b3b;--ss:#00d4ff;--sc:#00ff88;--se:#ff8800;--scr:#b84dff;--modal-bg:rgba(0,0,0,.85)}
+[data-theme="light"]{--bg:#f5f5f5;--bg2:#fff;--bg3:#eee;--bg4:#e0e0e0;--border:#ddd;--border-glow:#bbb;--text:#1a1a1a;--text-dim:#555;--text-muted:#999;--accent:#111;--su:#e03030;--ss:#0090cc;--sc:#00994d;--se:#cc6e00;--scr:#8833cc;--modal-bg:rgba(0,0,0,.45)}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh;transition:background .3s,color .3s}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border-glow);border-radius:3px}
 @keyframes pulse{0%,100%{opacity:.4}50%{opacity:1}}
 @keyframes scanline{0%{transform:translateY(-100%)}100%{transform:translateY(100vh)}}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @keyframes slideR{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
 @keyframes glow{0%,100%{box-shadow:0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 20px rgba(255,255,255,.04)}}
+.theme-toggle{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;font-size:10px;color:var(--text-dim);letter-spacing:1px;transition:all .25s}
+.theme-toggle:hover{border-color:var(--border-glow);color:var(--text)}
+.theme-toggle .t-icon{font-size:14px;line-height:1}
+.recurring-badge{font-size:7px;padding:2px 6px;border-radius:8px;background:rgba(184,77,255,.12);color:var(--scr);letter-spacing:.5px;font-weight:600}
 .scan{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden}
 .scan::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent);animation:scanline 10s linear infinite}
-.gridbg{position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;z-index:0}
+.gridbg{position:fixed;inset:0;background-image:linear-gradient(rgba(128,128,128,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(128,128,128,.03) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;z-index:0}
+[data-theme="light"] .gridbg,[data-theme="light"] .scan{display:none}
 .app{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh}
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;border-bottom:1px solid var(--border);background:rgba(5,5,5,.96);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;border-bottom:1px solid var(--border);background:var(--bg2);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100}
 .logo{display:flex;align-items:center;gap:12px}
 .logo-icon{width:42px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:transparent}
 .logo-icon img{width:42px;height:42px;object-fit:contain}
@@ -56,8 +62,8 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tex
 .clock{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-muted);letter-spacing:1px}
 .pwa-banner{padding:8px 28px;background:linear-gradient(90deg,rgba(0,255,136,.06),transparent);border-bottom:1px solid rgba(0,255,136,.15);display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--sc)}
 .pwa-banner button{background:rgba(0,255,136,.12);border:1px solid rgba(0,255,136,.3);color:var(--sc);padding:5px 14px;border-radius:6px;font-family:'Space Grotesk';font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
-.nav{display:flex;gap:2px;padding:10px 28px;border-bottom:1px solid var(--border);background:rgba(8,8,8,.95);backdrop-filter:blur(10px)}
-.nav-btn{padding:9px 18px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--text-muted);font-family:'Space Grotesk';font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .25s}
+.nav{display:flex;gap:2px;padding:6px 24px;border-bottom:1px solid var(--border);background:var(--bg2);backdrop-filter:blur(10px)}
+.nav-btn{padding:7px 14px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--text-muted);font-family:'Space Grotesk';font-size:10px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .25s}
 .nav-btn:hover{color:var(--text);background:var(--bg3)}
 .nav-btn.active{color:var(--accent);background:var(--bg3);border-color:var(--border-glow);box-shadow:0 0 15px rgba(255,255,255,.04)}
 .main{display:flex;flex:1}
@@ -78,20 +84,20 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tex
 .sd{width:7px;height:7px;border-radius:3px;flex-shrink:0}
 .stitle{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid var(--border)}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
-.stat{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px;text-align:center;transition:all .3s}
-.stat:hover{border-color:var(--border-glow);box-shadow:0 0 20px rgba(255,255,255,.03)}
-.stat-v{font-size:26px;font-weight:700;letter-spacing:-1px;margin-bottom:3px}
-.stat-l{font-size:9px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;transition:all .3s}
+.stat:hover{border-color:var(--border-glow)}
+.stat-v{font-size:20px;font-weight:700;letter-spacing:-1px;margin-bottom:2px}
+.stat-l{font-size:8px;color:var(--text-muted);letter-spacing:2px;text-transform:uppercase}
 .alert{padding:10px 14px;border-radius:10px;border:1px solid;margin-bottom:10px;display:flex;align-items:center;gap:9px;font-size:11px;animation:fadeIn .3s ease}
 .alert-ok{border-color:rgba(0,255,136,.25);background:rgba(0,255,136,.04);color:var(--sc)}
 .calgrid{display:grid;grid-template-columns:60px repeat(7,1fr);gap:1px;background:var(--border);border-radius:12px;overflow:hidden;border:1px solid var(--border)}
-.calh{background:var(--bg3);padding:12px 6px;text-align:center;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)}
+.calh{background:var(--bg3);padding:8px 4px;text-align:center;font-size:9px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted)}
 .calh.today{color:var(--accent)}
 .calh.today::after{content:'';display:block;margin:4px auto 0;width:16px;height:2px;background:var(--accent);border-radius:1px}
-.calt{background:var(--bg2);padding:0 6px;display:flex;align-items:flex-start;justify-content:center;padding-top:3px;font-family:'JetBrains Mono';font-size:9px;color:var(--text-muted);height:48px}
-.calc{background:var(--bg);height:48px;position:relative;cursor:pointer;transition:background .15s}
+.calt{background:var(--bg2);padding:0 4px;display:flex;align-items:flex-start;justify-content:center;padding-top:2px;font-family:'JetBrains Mono';font-size:8px;color:var(--text-muted);height:32px}
+.calc{background:var(--bg);height:32px;position:relative;cursor:pointer;transition:background .15s}
 .calc:hover{background:var(--bg3)}
-.calev{position:absolute;left:2px;right:2px;border-radius:4px;padding:2px 5px;font-size:8px;font-weight:500;letter-spacing:.2px;overflow:hidden;cursor:pointer;transition:all .15s;z-index:2;border-left:3px solid;white-space:nowrap;text-overflow:ellipsis}
+.calev{position:absolute;left:1px;right:1px;border-radius:3px;padding:1px 4px;font-size:7px;font-weight:500;letter-spacing:.2px;overflow:hidden;cursor:pointer;transition:all .15s;z-index:2;border-left:2px solid;white-space:nowrap;text-overflow:ellipsis}
 .calev:hover{transform:scale(1.03);z-index:3}
 .calev.unavailable{background:rgba(255,59,59,.1);color:var(--su);border-left-color:var(--su)}
 .calev.solo{background:rgba(0,212,255,.1);color:var(--ss);border-left-color:var(--ss)}
@@ -165,7 +171,7 @@ select.input{cursor:pointer;-webkit-appearance:none}
 .tr-fill{height:100%;border-radius:3px;transition:width .5s ease}
 .tr-lbl{font-size:10px;width:90px;color:var(--text-dim)}
 .tr-val{font-family:'JetBrains Mono';font-size:10px;width:35px;text-align:right}
-.moverlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;z-index:1000;animation:fadeIn .15s ease}
+.moverlay{position:fixed;inset:0;background:var(--modal-bg);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;z-index:1000;animation:fadeIn .15s ease}
 .modal{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px;width:480px;max-width:92vw;box-shadow:0 0 60px rgba(0,0,0,.6)}
 .modal-title{font-size:15px;font-weight:700;letter-spacing:1px;margin-bottom:18px}
 .mrow{margin-bottom:12px}
@@ -195,8 +201,8 @@ select.input{cursor:pointer;-webkit-appearance:none}
   .cal-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -12px;padding:0 12px}
   .cal-scroll::-webkit-scrollbar{display:none}
   .calgrid{min-width:600px;font-size:8px;grid-template-columns:50px repeat(7,1fr)}
-  .calh{padding:8px 4px;font-size:8px}.calt{font-size:8px;height:40px;padding:0 3px}
-  .calc{height:40px}.calev{font-size:7px;padding:1px 3px}
+  .calh{padding:6px 3px;font-size:7px}.calt{font-size:7px;height:28px;padding:0 2px}
+  .calc{height:28px}.calev{font-size:6px;padding:1px 2px}
   .card{padding:12px;margin-bottom:10px}
   .slots{grid-template-columns:repeat(2,1fr);gap:6px}
   .slot{padding:10px}.slot-time{font-size:13px}
@@ -347,6 +353,7 @@ function App(){
   const[newTodoDay,setNewTodoDay]=useState('');
   const[newTodoStart,setNewTodoStart]=useState('');
   const[newTodoEnd,setNewTodoEnd]=useState('');
+  const[newRecur,setNewRecur]=useState('none');
   const[calView,setCalView]=useState('week');
   const[showPwa,setShowPwa]=useState(true);
   const[sidebarOpen,setSidebarOpen]=useState(false);
@@ -358,6 +365,9 @@ function App(){
   const[expandedTodo,setExpandedTodo]=useState(null);
   const[newSubtext,setNewSubtext]=useState('');
   const[notifs,setNotifs]=useSyncedState('sbas_notifs',[]);
+  const[theme,setTheme]=useState(()=>{try{return localStorage.getItem('sbas_theme')||'dark'}catch(e){return'dark'}});
+  useEffect(()=>{document.documentElement.setAttribute('data-theme',theme);try{localStorage.setItem('sbas_theme',theme)}catch(e){}},[theme]);
+  const toggleTheme=()=>setTheme(prev=>prev==='dark'?'light':'dark');
 
   const todayIdx=useMemo(()=>{const d=new Date().getDay();return d===0?6:d-1},[]);
   const filtEv=useMemo(()=>selUser==='all'?events:events.filter(e=>e.owner===selUser),[events,selUser]);
@@ -376,9 +386,9 @@ function App(){
   },[events]);
 
   const stats=useMemo(()=>{
-    const tH=events.filter(e=>e.owner==='titouan'&&e.status!=='unavailable').reduce((s,e)=>s+(e.end-e.start),0);
-    const kH=events.filter(e=>e.owner==='keda'&&e.status!=='unavailable').reduce((s,e)=>s+(e.end-e.start),0);
-    const cH=events.filter(e=>e.status==='collab').reduce((s,e)=>s+(e.end-e.start),0);
+    const tH=Math.round(events.filter(e=>e.owner==='titouan'&&e.status!=='unavailable').reduce((s,e)=>s+(e.end-e.start),0)*10)/10;
+    const kH=Math.round(events.filter(e=>e.owner==='keda'&&e.status!=='unavailable').reduce((s,e)=>s+(e.end-e.start),0)*10)/10;
+    const cH=Math.round(events.filter(e=>e.status==='collab').reduce((s,e)=>s+(e.end-e.start),0)*10)/10;
     const tDone=todos.filter(t=>t.done).length;
     const tSched=todos.filter(t=>t.scheduled).length;
     return{tH,kH,cH,tDone,tTotal:todos.length,tSched};
@@ -401,7 +411,15 @@ function App(){
     setShowModal(null);setSchedTodo(null);
   };
 
-  const toggleTodo=id=>setTodos(prev=>prev.map(t=>t.id===id?{...t,done:!t.done}:t));
+  const toggleTodo=id=>setTodos(prev=>prev.map(t=>{
+    if(t.id!==id)return t;
+    const nowDone=!t.done;
+    if(nowDone&&t.recurrence){
+      const newId=Date.now()+Math.random()*1000|0;
+      setTimeout(()=>setTodos(p=>[...p,{id:newId,text:t.text,done:false,priority:t.priority,owner:t.owner,project:t.project,scheduled:t.scheduled,subtasks:[],recurrence:t.recurrence,lastRecreated:Date.now()}]),500);
+    }
+    return{...t,done:nowDone};
+  }));
   const deleteTodo=id=>{
     const todo=todos.find(t=>t.id===id);
     if(todo&&todo.scheduled){setEvents(prev=>prev.filter(e=>!(e.title===todo.text&&e.owner===todo.owner)));}
@@ -418,9 +436,10 @@ function App(){
       sched={day,start:st,end:en};
       setEvents(ev=>[...ev,{id:tid+1,day,start:st,end:en,title:newTodo,status:'solo',owner:todoView,date:''}]);
     }
-    setTodos(prev=>[...prev,{id:tid,text:newTodo,done:false,priority:newPri,owner:todoView,project:newProj,scheduled:sched,subtasks:[]}]);
+    const recurrence=newRecur!=='none'?newRecur:null;
+    setTodos(prev=>[...prev,{id:tid,text:newTodo,done:false,priority:newPri,owner:todoView,project:newProj,scheduled:sched,subtasks:[],recurrence,lastRecreated:null}]);
     setNotifs(prev=>[...prev,{id:Date.now(),for:todoView,text:newTodo,from:todoView==='titouan'?'Titouan a assigne':'Keda a assigne',ts:Date.now()}]);
-    setNewTodo('');setNewTodoDay('');setNewTodoStart('');setNewTodoEnd('');
+    setNewTodo('');setNewTodoDay('');setNewTodoStart('');setNewTodoEnd('');setNewRecur('none');
   };
   const openSchedule=(todo)=>{setSchedTodo(todo);setSchedEv({day:2,start:9,end:10,status:'solo'});setShowModal('schedule');};
   const startEdit=(t)=>{setEditingTodo(t.id);setEditText(t.text);};
@@ -450,8 +469,9 @@ function App(){
         <div><div className="logo-text">LCX</div><div className="logo-sub">Agency &middot; S.B.A.S.</div></div>
       </div>
       <div className="topbar-r">
-        <div className="live"><span className="live-dot"></span>SYSTEME ACTIF</div>
+        <div className="live"><span className="live-dot"></span>ACTIF</div>
         <Clock/>
+        <button className="theme-toggle" onClick={toggleTheme}><span className="t-icon">{theme==='dark'?'\u2600':'\u263E'}</span>{theme==='dark'?'Clair':'Sombre'}</button>
       </div>
     </div>
 
@@ -497,8 +517,7 @@ function App(){
         <div style={{marginTop:24}}>
           <div className="stitle">Actions</div>
           <button className="btn" style={{width:'100%',marginBottom:6}} onClick={()=>{setShowModal('event');setNewEv({title:'',day:0,start:9,end:10,status:'solo',owner:'titouan',date:''})}}>+ Evenement</button>
-          <button className="btn" style={{width:'100%',marginBottom:6}} onClick={()=>setTab('collab')}>Trouver un Creneau</button>
-          <button className="btn" style={{width:'100%'}} onClick={()=>setTab('todos')}>Gerer les Taches</button>
+          <button className="btn" style={{width:'100%',marginBottom:6}} onClick={()=>setTab('todos')}>Taches</button>
         </div>
         <div style={{marginTop:24}}>
           <div className="stitle">Stats</div>
@@ -516,20 +535,8 @@ function App(){
           <div className="stats">
             <div className="stat"><div className="stat-v">{stats.tH}h</div><div className="stat-l">Titouan</div></div>
             <div className="stat"><div className="stat-v">{stats.kH}h</div><div className="stat-l">Keda</div></div>
-            <div className="stat"><div className="stat-v" style={{color:'#00ff88'}}>{stats.cH}h</div><div className="stat-l">Collab</div></div>
+            <div className="stat"><div className="stat-v" style={{color:'var(--sc)'}}>{stats.cH}h</div><div className="stat-l">Collab</div></div>
             <div className="stat"><div className="stat-v">{stats.tDone}/{stats.tTotal}</div><div className="stat-l">Taches OK</div></div>
-          </div>
-          <div className="alert alert-ok"><span>&#10003;</span> Aucun conflit detecte &mdash; Anti-bug actif</div>
-          {collabSlots.filter(s=>s.day===todayIdx).length>0&&(
-            <div className="alert alert-ok"><span>&#9673;</span>{collabSlots.filter(s=>s.day===todayIdx).length} creneau(x) collab aujourd'hui</div>
-          )}
-          <div className="card">
-            <div className="card-h"><span className="card-t">Prochains Creneaux Collab</span><span className="card-b">{collabSlots.length} DISPOS</span></div>
-            <div className="slots">
-              {collabSlots.slice(0,8).map((s,i)=>(
-                <div key={i} className="slot"><div className="slot-day">{FDAYS[s.day]}</div><div className="slot-time">{s.sh}:00 &mdash; {s.eh}:00</div><span className="slot-badge avail">Disponible</span></div>
-              ))}
-            </div>
           </div>
           <div className="card">
             <div className="card-h"><span className="card-t">Taches Prioritaires</span><button className="btn btn-sm" onClick={()=>setTab('todos')}>Tout Voir</button></div>
@@ -570,7 +577,7 @@ function App(){
                   {DAYS.map((_,d)=>(
                     <div key={d+'-'+h} className="calc">
                       {filtEv.filter(e=>e.day===d&&Math.floor(e.start)===h).map(e=>(
-                        <div key={e.id} className={"calev "+e.status} style={{top:(e.start-h)*100+'%',height:(e.end-e.start)*48+'px'}} title={e.title+' ('+( e.owner==='titouan'?'Titouan':'Keda')+')'} onClick={()=>openEventDetail(e)}>
+                        <div key={e.id} className={"calev "+e.status} style={{top:(e.start-h)*100+'%',height:(e.end-e.start)*32+'px'}} title={e.title+' ('+( e.owner==='titouan'?'Titouan':'Keda')+')'} onClick={()=>openEventDetail(e)}>
                           {e.title}<span className="ev-owner">{e.owner==='titouan'?' T':' K'}</span>
                         </div>
                       ))}
@@ -618,8 +625,11 @@ function App(){
             <select className="input" style={{width:90}} value={newPri} onChange={e=>setNewPri(e.target.value)}>
               <option value="high">Haute</option><option value="medium">Moyenne</option><option value="low">Basse</option>
             </select>
-            <input className="input" style={{width:120}} placeholder="Projet..." value={newProj} onChange={e=>setNewProj(e.target.value)}/>
-            <button className="btn btn-pr" onClick={addTodo}>Ajouter</button>
+            <input className="input" style={{width:100}} placeholder="Projet..." value={newProj} onChange={e=>setNewProj(e.target.value)}/>
+            <select className="input" style={{width:100}} value={newRecur} onChange={e=>setNewRecur(e.target.value)}>
+              <option value="none">Unique</option><option value="daily">Quotidien</option><option value="weekly">Hebdo</option><option value="monthly">Mensuel</option>
+            </select>
+            <button className="btn btn-pr" onClick={addTodo}>+</button>
           </div>
           <div className="add-bar" style={{opacity:newTodo.trim()?1:.4,transition:'opacity .3s'}}>
             <span style={{fontSize:9,color:'var(--text-muted)',letterSpacing:1,textTransform:'uppercase',alignSelf:'center',marginRight:4}}>Planifier (optionnel) :</span>
@@ -656,6 +666,7 @@ function App(){
                   <span className={"todo-tag "+t.priority}>{t.priority}</span>
                   <span className="todo-tag proj">{t.project}</span>
                   {t.scheduled&&<span style={{fontSize:8,color:'var(--sc)'}}>&#128197; {FDAYS[t.scheduled.day]} {fmtTime(t.scheduled.start)}&mdash;{fmtTime(t.scheduled.end)}</span>}
+                  {t.recurrence&&<span className="recurring-badge">{t.recurrence==='daily'?'Quotidien':t.recurrence==='weekly'?'Hebdo':'Mensuel'}</span>}
                   {isOverdue(t)&&<span style={{fontSize:8,color:'var(--su)',fontWeight:600}}>EN RETARD</span>}
                 </div>
                 {expandedTodo===t.id&&(
@@ -711,35 +722,20 @@ function App(){
         {/* COLLAB */}
         {tab==='collab'&&(
         <div className="tab-c">
-          <div className="alert alert-ok"><span>&#9673;</span>{collabSlots.length} creneaux de collaboration detectes</div>
           <div className="card">
-            <div className="card-h"><span className="card-t">Creneaux Disponibles</span><span className="card-b">AUTO-DETECTE</span></div>
-            <div className="slots">
-              {collabSlots.map((s,i)=>(
-                <div key={i} className="slot"><div className="slot-day">{FDAYS[s.day]}</div><div className="slot-time">{s.sh}:00 &mdash; {s.eh}:00</div>
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:3}}>
-                  <span className="slot-badge avail">Disponible</span><span style={{fontSize:8,color:'var(--text-muted)'}}>{s.eh-s.sh}h</span>
-                </div></div>
-              ))}
-            </div>
-          </div>
-          <div className="card">
-            <div className="card-h"><span className="card-t">Analyse</span></div>
+            <div className="card-h"><span className="card-t">Analyse Collaboration</span></div>
             <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10}}>
               <div style={{padding:14,border:'1px solid var(--border)',borderRadius:10,textAlign:'center'}}>
-                <div style={{fontSize:22,fontWeight:700,color:'#00ff88'}}>MER</div>
+                <div style={{fontSize:22,fontWeight:700,color:'var(--sc)'}}>MER</div>
                 <div style={{fontSize:9,color:'var(--text-muted)',marginTop:3}}>MEILLEUR JOUR</div>
-                <div style={{fontSize:10,marginTop:6}}>Aucun trajet &mdash; max collab</div>
               </div>
               <div style={{padding:14,border:'1px solid var(--border)',borderRadius:10,textAlign:'center'}}>
-                <div style={{fontSize:22,fontWeight:700,color:'#00d4ff'}}>9h&mdash;12h</div>
+                <div style={{fontSize:22,fontWeight:700,color:'var(--ss)'}}>9h&mdash;12h</div>
                 <div style={{fontSize:9,color:'var(--text-muted)',marginTop:3}}>PLAGE OPTIMALE</div>
-                <div style={{fontSize:10,marginTop:6}}>Productivite max</div>
               </div>
               <div style={{padding:14,border:'1px solid var(--border)',borderRadius:10,textAlign:'center'}}>
-                <div style={{fontSize:22,fontWeight:700,color:'#b84dff'}}>~{stats.cH}h</div>
+                <div style={{fontSize:22,fontWeight:700,color:'var(--scr)'}}>~{stats.cH}h</div>
                 <div style={{fontSize:9,color:'var(--text-muted)',marginTop:3}}>PAR SEMAINE</div>
-                <div style={{fontSize:10,marginTop:6}}>Ensemble cette semaine</div>
               </div>
             </div>
           </div>
@@ -747,7 +743,7 @@ function App(){
             <div className="card-h"><span className="card-t">Historique Collab</span></div>
             {['Semaine en cours','Semaine -1','Semaine -2','Semaine -3'].map((w,i)=>{
               const hrs=[stats.cH,3,5,4][i];
-              return(<div key={w} className="tr-row"><span className="tr-lbl">{w}</span><div className="tr-bg"><div className="tr-fill" style={{width:hrs*12+'%',background:'#00ff88'}}></div></div><span className="tr-val">{hrs}h</span></div>);
+              return(<div key={w} className="tr-row"><span className="tr-lbl">{w}</span><div className="tr-bg"><div className="tr-fill" style={{width:hrs*12+'%',background:'var(--sc)'}}></div></div><span className="tr-val">{hrs}h</span></div>);
             })}
           </div>
         </div>)}
@@ -846,7 +842,7 @@ function App(){
         <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:16}}>
           <div><div className="mlbl">Jour</div><div style={{fontSize:14,fontWeight:600}}>{FDAYS[selEvent.day]}</div></div>
           <div><div className="mlbl">Associe</div><div style={{fontSize:14,fontWeight:600}}>{selEvent.owner==='titouan'?'Titouan':'Keda'}</div></div>
-          <div><div className="mlbl">Horaire</div><div style={{fontSize:14,fontWeight:600,fontFamily:"'JetBrains Mono'"}}>{Math.floor(selEvent.start)}:00 &mdash; {Math.floor(selEvent.end)}:{selEvent.end%1?'30':'00'}</div></div>
+          <div><div className="mlbl">Horaire</div><div style={{fontSize:14,fontWeight:600,fontFamily:"'JetBrains Mono'"}}>{fmtTime(selEvent.start)} &mdash; {fmtTime(selEvent.end)}</div></div>
           <div><div className="mlbl">Statut</div><div style={{fontSize:13}}><span className="sd" style={{background:STATUSES.find(s=>s.id===selEvent.status)?.color,display:'inline-block',marginRight:6,verticalAlign:'middle'}}></span>{STATUSES.find(s=>s.id===selEvent.status)?.label}</div></div>
           {selEvent.date&&<div><div className="mlbl">Date</div><div style={{fontSize:14}}>{selEvent.date}</div></div>}
         </div>
