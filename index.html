@@ -120,8 +120,8 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tex
 .todo-tab.active-k{border-color:var(--scr);background:rgba(184,77,255,.08)}
 .todo-priority-group{margin-bottom:18px}
 .todo-priority-header{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:10px 0 8px;border-bottom:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.todo-priority-header.urgent{color:var(--su)}
-.todo-priority-header.urgent::before{content:'';width:3px;height:14px;background:var(--su);border-radius:1px}
+.todo-priority-header.urgent{color:var(--sc)}
+.todo-priority-header.urgent::before{content:'';width:3px;height:14px;background:var(--sc);border-radius:1px}
 .todo-priority-header.later{color:var(--ss)}
 .todo-priority-header.later::before{content:'';width:3px;height:14px;background:var(--ss);border-radius:1px}
 .todo-priority-header.scheduled-later{color:var(--scr)}
@@ -540,7 +540,16 @@ function App(){
       const separators=/\s*(?:puis|ensuite|apr[eè]s|et aussi|aussi|et ensuite)\s*/gi;
       let tasks=cleaned.split(separators).map(t=>t.replace(/^[\s,.\-:]+|[\s,.\-:]+$/g,'').trim()).filter(t=>t.length>2);
       if(tasks.length===0)tasks=[cleaned];
-      tasks=tasks.map(t=>t.charAt(0).toUpperCase()+t.slice(1));
+      const cleanTitle=(raw)=>{
+        let t=raw.trim();
+        t=t.replace(/^(il faut|je dois|je veux|faut|faudrait|il faudrait|j'aimerais|je voudrais|pense[r]? [aà]|n'oublie pas de|oublie pas de|faire)s+/i,'');
+        t=t.replace(/^(que je|que l'on|qu'on)s+/i,'');
+        t=t.replace(/s+(s'il te pla[iî]t|stp|please|voil[aà]|quoi|en fait|du coup)$/i,'');
+        t=t.charAt(0).toUpperCase()+t.slice(1);
+        if(t.length>60)t=t.substring(0,57)+'...';
+        return t;
+      };
+      tasks=tasks.map(t=>cleanTitle(t));
       tasks.forEach((taskText,i)=>{
         setTimeout(()=>{
           const tid=Date.now()+i;
@@ -684,15 +693,13 @@ function App(){
   const deleteEvent=(id)=>{setEvents(prev=>prev.filter(e=>e.id!==id));setSelEvent(null);setShowModal(null);};
   const openEventDetail=(ev)=>{setSelEvent(ev);setShowModal('detail');};
 
-  const isScheduledLater=(t)=>{
-    if(!t.scheduled||t.done)return false;
-    const now=new Date();
-    const curDay=((now.getDay()+6)%7);
-    return t.scheduled.day>curDay;
-  };
+  const todayDayIdx=(()=>{const d=new Date().getDay();return d===0?6:d-1;})();
+  const isForToday=(t)=>{if(!t.scheduled)return true;return t.scheduled.day===todayDayIdx;};
+  const isForLater=(t)=>{if(!t.scheduled)return false;return t.scheduled.day!==todayDayIdx;};
   const curTodos=todos.filter(t=>t.owner===todoView);
-  const laterTodos=curTodos.filter(t=>!t.done&&isScheduledLater(t));
-  const activeTodos=curTodos.filter(t=>!t.done&&!isScheduledLater(t));
+  const todayTodos=curTodos.filter(t=>!t.done&&isForToday(t));
+  const laterTodos=curTodos.filter(t=>!t.done&&isForLater(t));
+  const activeTodos=todayTodos;
   const doneTodos=curTodos.filter(t=>t.done);
 
   return(
@@ -869,14 +876,11 @@ function App(){
           </div>
           {voiceText&&<div className={"voice-status "+(voiceStatus==='listening'?'active':voiceStatus==='success'?'success':'')}>{voiceText}</div>}
 
-          {activeTodos.length===0&&<div style={{textAlign:'center',padding:40,color:'var(--text-muted)',fontSize:13}}>Aucune tache active pour {todoView==='titouan'?'Titouan':'Keda'}</div>}
+          {todayTodos.length===0&&laterTodos.length===0&&<div style={{textAlign:'center',padding:40,color:'var(--text-muted)',fontSize:13}}>Aucune tache pour {todoView==='titouan'?'Titouan':'Keda'}</div>}
 
-          {[{key:'high',label:'URGENT',cls:'urgent'},{key:'normal',label:'A FAIRE',cls:'later'}].map(grp=>{
-            const items=activeTodos.filter(t=>grp.key==='high'?t.priority==='high':(t.priority==='medium'||t.priority==='low'));
-            if(!items.length) return null;
-            return(
-            <div key={grp.key} className="todo-priority-group">
-              <div className={"todo-priority-header "+grp.cls}>{grp.label} ({items.length})</div>
+          {todayTodos.length>0&&(
+            <div className="todo-priority-group">
+              <div className="todo-priority-header urgent">AUJOURD&rsquo;HUI ({todayTodos.length})</div>
               {items.map(t=>(
                 <div key={t.id} className={"todo-item priority-"+t.priority+(isOverdue(t)?" overdue":"")+(dragId===t.id?" dragging":"")+(dragOverId===t.id&&dragId!==t.id?" drag-over":"")} draggable={editingTodo!==t.id} onDragStart={e=>onDragStart(e,t.id)} onDragOver={e=>onDragOver(e,t.id)} onDragEnd={onDragEnd} onDrop={e=>onDrop(e,t.id)}>
                   <div className="drag-grip" title="Glisser">&#x2807;</div>
@@ -918,8 +922,7 @@ function App(){
                   </div>
                 </div>
               ))}
-            </div>);
-          })}
+            </div>)}
 
           {laterTodos.length>0&&(
             <div className="todo-priority-group">
