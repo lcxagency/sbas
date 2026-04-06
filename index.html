@@ -542,9 +542,35 @@ function App(){
       if(tasks.length===0)tasks=[cleaned];
       const cleanTitle=(raw)=>{
         let t=raw.trim();
-        t=t.replace(/^(il faut|je dois|je veux|faut|faudrait|il faudrait|j'aimerais|je voudrais|pense[r]? [aà]|n'oublie pas de|oublie pas de|faire)s+/i,'');
-        t=t.replace(/^(que je|que l'on|qu'on)s+/i,'');
-        t=t.replace(/s+(s'il te pla[iî]t|stp|please|voil[aà]|quoi|en fait|du coup)$/i,'');
+        t=t.replace(/^(il faut que je|il faut que j'|il faut|je dois|je veux|je voudrais|j'aimerais|j'ai besoin de|faut que je|faut que j'|faut|faudrait que je|faudrait que j'|il faudrait que je|il faudrait|penser? [aà]|n'oublie pas de|oublie pas de|rappelle[- ]?moi de|pense [aà]|il y a|faire)\s+/i,'');
+        t=t.replace(/^(que je|que j'|que l'on|qu'on)\s+/i,'');
+        t=t.replace(/\s+(s'il te pla[iî]t|stp|please|voil[aà]|quoi|en fait|du coup|ok|hein|bref|genre|tu vois|tu sais)$/i,'');
+        t=t.replace(/^(le |la |les |l'|un |une |des |du |de la |au |aux )/i,(m)=>m);
+        t=t.replace(/^appeler\s+/i,'Appel ');
+        t=t.replace(/^rappeler\s+/i,'Rappel ');
+        t=t.replace(/^envoyer\s+(un |une |le |la |l'|des |les )?/i,'Envoi ');
+        t=t.replace(/^contacter\s+/i,'Contact ');
+        t=t.replace(/^pr[eé]parer\s+(le |la |les |l'|un |une )?/i,'Prep ');
+        t=t.replace(/^r[eé]pondre\s+([aà]\s+)?/i,'Reponse ');
+        t=t.replace(/^v[eé]rifier\s+(le |la |les |l')?/i,'Verif ');
+        t=t.replace(/^mettre [aà] jour\s+(le |la |les |l')?/i,'MAJ ');
+        t=t.replace(/^planifier\s+(le |la |les |l'|un |une )?/i,'Planif ');
+        t=t.replace(/^organiser\s+(le |la |les |l'|un |une )?/i,'Orga ');
+        t=t.replace(/^finaliser\s+(le |la |les |l'|un |une )?/i,'Finalisation ');
+        t=t.replace(/^cr[eé]er\s+(le |la |les |l'|un |une )?/i,'Creation ');
+        t=t.replace(/^rechercher\s+(le |la |les |l'|un |une |des )?/i,'Recherche ');
+        t=t.replace(/^chercher\s+(le |la |les |l'|un |une |des )?/i,'Recherche ');
+        t=t.replace(/^relancer\s+/i,'Relance ');
+        t=t.replace(/^suivre\s+(le |la |les |l')?/i,'Suivi ');
+        t=t.replace(/^r[eé]diger\s+(le |la |les |l'|un |une )?/i,'Redaction ');
+        t=t.replace(/^[eé]crire\s+(le |la |les |l'|un |une )?/i,'Redaction ');
+        t=t.replace(/^analyser\s+(le |la |les |l')?/i,'Analyse ');
+        t=t.replace(/^corriger\s+(le |la |les |l')?/i,'Correction ');
+        t=t.replace(/^terminer\s+(le |la |les |l')?/i,'Finalisation ');
+        t=t.replace(/^finir\s+(le |la |les |l'|de )?/i,'Finalisation ');
+        t=t.replace(/^modifier\s+(le |la |les |l')?/i,'Modif ');
+        t=t.replace(/^lancer\s+(le |la |les |l'|un |une )?/i,'Lancement ');
+        t=t.replace(/\s+/g,' ').trim();
         t=t.charAt(0).toUpperCase()+t.slice(1);
         if(t.length>60)t=t.substring(0,57)+'...';
         return t;
@@ -881,7 +907,7 @@ function App(){
           {todayTodos.length>0&&(
             <div className="todo-priority-group">
               <div className="todo-priority-header urgent">AUJOURD&rsquo;HUI ({todayTodos.length})</div>
-              {items.map(t=>(
+              {todayTodos.map(t=>(
                 <div key={t.id} className={"todo-item priority-"+t.priority+(isOverdue(t)?" overdue":"")+(dragId===t.id?" dragging":"")+(dragOverId===t.id&&dragId!==t.id?" drag-over":"")} draggable={editingTodo!==t.id} onDragStart={e=>onDragStart(e,t.id)} onDragOver={e=>onDragOver(e,t.id)} onDragEnd={onDragEnd} onDrop={e=>onDrop(e,t.id)}>
                   <div className="drag-grip" title="Glisser">&#x2807;</div>
                   <div className="todo-check" onClick={()=>toggleTodo(t.id)}></div>
