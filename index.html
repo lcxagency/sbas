@@ -684,7 +684,6 @@ function App(){
   const deleteEvent=(id)=>{setEvents(prev=>prev.filter(e=>e.id!==id));setSelEvent(null);setShowModal(null);};
   const openEventDetail=(ev)=>{setSelEvent(ev);setShowModal('detail');};
 
-  const todayIdx=useMemo(()=>{const d=new Date().getDay();return d===0?6:d-1},[]);
   const isScheduledLater=(t)=>{
     if(!t.scheduled||t.done)return false;
     const now=new Date();
