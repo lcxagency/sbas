@@ -157,6 +157,17 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tex
 .todo-item.drag-over{border-left-color:var(--ss);box-shadow:inset 0 -2px 0 var(--ss)}
 .drag-grip{cursor:grab;color:var(--text-muted);font-size:14px;letter-spacing:-2px;padding:0 4px;user-select:none;flex-shrink:0;display:flex;align-items:center;margin-left:-8px}
 .drag-grip:active{cursor:grabbing}
+/* VOICE COMMAND */
+@keyframes voicePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,59,59,.4)}50%{box-shadow:0 0 0 12px rgba(255,59,59,0)}}
+.voice-btn{width:44px;height:44px;border-radius:50%;border:2px solid var(--border);background:var(--bg3);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all .3s;flex-shrink:0}
+.voice-btn:hover{border-color:var(--border-glow);color:var(--text);background:var(--bg4)}
+.voice-btn.listening{border-color:var(--su);color:var(--su);background:rgba(255,59,59,.1);animation:voicePulse 1.5s ease infinite}
+.voice-btn.processing{border-color:var(--sc);color:var(--sc);background:rgba(0,255,136,.1)}
+.voice-status{font-size:11px;color:var(--text-muted);letter-spacing:.5px;padding:8px 0;text-align:center;min-height:28px}
+.voice-status.active{color:var(--su);font-weight:600}
+.voice-status.success{color:var(--sc);font-weight:600}
+.voice-row{display:flex;gap:10px;align-items:center;margin-bottom:16px}
+.voice-row .btn{flex:1}
 .todo-text{cursor:text}
 .subtasks-list{margin-top:10px;padding-left:12px;border-left:2px solid var(--border);animation:fadeIn .25s ease}
 .subtask-item{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:12px}
@@ -478,6 +489,65 @@ function App(){
   const[showDone,setShowDone]=useState(false);
   const[notifs,setNotifs]=useSyncedState('sbas_notifs',[]);
 
+  // VOICE COMMAND STATE
+  const[voiceStatus,setVoiceStatus]=useState('idle');
+  const[voiceText,setVoiceText]=useState('');
+  const voiceRef=React.useRef(null);
+
+  const startVoice=()=>{
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR){alert('Ton navigateur ne supporte pas la reconnaissance vocale. Utilise Chrome.');return;}
+    if(voiceStatus==='listening'){if(voiceRef.current)voiceRef.current.stop();return;}
+    const recognition=new SR();
+    recognition.lang='fr-FR';
+    recognition.continuous=true;
+    recognition.interimResults=true;
+    recognition.maxAlternatives=1;
+    voiceRef.current=recognition;
+    let finalTranscript='';
+    let silenceTimer=null;
+    recognition.onstart=()=>{setVoiceStatus('listening');setVoiceText('Parle maintenant...');};
+    recognition.onresult=(event)=>{
+      let interim='';
+      for(let i=event.resultIndex;i<event.results.length;i++){
+        if(event.results[i].isFinal){finalTranscript+=event.results[i][0].transcript+' ';}
+        else{interim+=event.results[i][0].transcript;}
+      }
+      setVoiceText(finalTranscript+interim||'Ecoute...');
+      if(silenceTimer)clearTimeout(silenceTimer);
+      silenceTimer=setTimeout(()=>{recognition.stop();},2500);
+    };
+    recognition.onerror=(e)=>{
+      if(e.error==='no-speech'){setVoiceText('Aucune voix detectee');setVoiceStatus('error');}
+      else if(e.error!=='aborted'){setVoiceText('Erreur: '+e.error);setVoiceStatus('error');}
+      setTimeout(()=>{setVoiceStatus('idle');setVoiceText('');},2000);
+    };
+    recognition.onend=()=>{
+      if(!finalTranscript.trim()){setVoiceStatus('idle');setVoiceText('');return;}
+      setVoiceStatus('processing');setVoiceText('Ajout des taches...');
+      const raw=finalTranscript.trim();
+      let owner=todoView;
+      if(/pour keda/i.test(raw))owner='keda';
+      if(/pour titouan/i.test(raw))owner='titouan';
+      const cleaned=raw.replace(/pour (keda|titouan)/gi,'').trim();
+      const separators=/\s*(?:puis|ensuite|apr[eè]s|et aussi|aussi|et ensuite)\s*/gi;
+      let tasks=cleaned.split(separators).map(t=>t.replace(/^[\s,.\-:]+|[\s,.\-:]+$/g,'').trim()).filter(t=>t.length>2);
+      if(tasks.length===0)tasks=[cleaned];
+      tasks=tasks.map(t=>t.charAt(0).toUpperCase()+t.slice(1));
+      tasks.forEach((taskText,i)=>{
+        setTimeout(()=>{
+          const tid=Date.now()+i;
+          setTodos(prev=>[...prev,{id:tid,text:taskText,done:false,priority:'medium',owner:owner,project:'General',scheduled:null,subtasks:[],recurrence:null,lastRecreated:null}]);
+          setNotifs(prev=>[...prev,{id:Date.now()+i,for:owner,text:taskText,from:owner==='titouan'?'Titouan (vocal)':'Keda (vocal)',ts:Date.now()}]);
+        },i*200);
+      });
+      setVoiceText(tasks.length+' tache'+(tasks.length>1?'s':'')+' ajoutee'+(tasks.length>1?'s':''));
+      setVoiceStatus('success');
+      setTimeout(()=>{setVoiceStatus('idle');setVoiceText('');},3000);
+    };
+    recognition.start();
+  };
+
   // OUTREACH STATE
   const[orStep,setOrStep]=useState(0);
   const[orName,setOrName]=useState('');
@@ -777,7 +847,13 @@ function App(){
             </div>
           </div>
 
-          <button className="btn btn-pr" style={{width:'100%',marginBottom:16,padding:'10px 0'}} onClick={()=>setShowAddTodo(true)}>+ Nouvelle tache</button>
+          <div className="voice-row">
+            <button className="btn btn-pr" style={{flex:1,padding:'10px 0'}} onClick={()=>setShowAddTodo(true)}>+ Nouvelle tache</button>
+            <button className={"voice-btn "+(voiceStatus==='listening'?'listening':voiceStatus==='processing'||voiceStatus==='success'?'processing':'')} onClick={startVoice} title="Commande vocale - dicte tes taches">
+              {voiceStatus==='listening'?'\u23F9':'\uD83C\uDF99'}
+            </button>
+          </div>
+          {voiceText&&<div className={"voice-status "+(voiceStatus==='listening'?'active':voiceStatus==='success'?'success':'')}>{voiceText}</div>}
 
           {activeTodos.length===0&&<div style={{textAlign:'center',padding:40,color:'var(--text-muted)',fontSize:13}}>Aucune tache active pour {todoView==='titouan'?'Titouan':'Keda'}</div>}
 
