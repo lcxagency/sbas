@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>LCX Agency â S.B.A.S.</title>
+<title>LCX Agency Ã¢ÂÂ S.B.A.S.</title>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -106,42 +106,62 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tex
 .calev.creative{background:rgba(184,77,255,.1);color:var(--scr);border-left-color:var(--scr)}
 .calev .ev-owner{font-size:7px;opacity:.7;margin-left:2px}
 
-/* TODOS - TAB SYSTEM */
-.todo-tabs{display:flex;gap:4px;margin-bottom:20px}
-.todo-tab{flex:1;padding:14px;border-radius:10px;border:2px solid var(--border);background:var(--bg2);cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:10px}
-.todo-tab:hover{border-color:var(--border-glow)}
-.todo-tab.active-t{border-color:var(--ss);background:rgba(0,212,255,.04)}
-.todo-tab.active-k{border-color:var(--scr);background:rgba(184,77,255,.04)}
-.todo-tab .tab-name{font-size:14px;font-weight:700;letter-spacing:.5px}
-.todo-tab .tab-count{font-family:'JetBrains Mono';font-size:11px;color:var(--text-muted);margin-left:auto}
-.todo-item{display:flex;align-items:flex-start;gap:10px;padding:14px;border-radius:10px;border:1px solid var(--border);margin-bottom:8px;transition:all .25s;animation:slideR .3s ease;position:relative}
-.todo-item:hover{border-color:var(--border-glow);background:rgba(255,255,255,.01)}
-.todo-check{width:18px;height:18px;border-radius:5px;border:2px solid var(--border-glow);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;margin-top:1px}
-.todo-check.done{background:var(--accent);border-color:var(--accent)}
-.todo-check.done::after{content:'\2713';color:var(--bg);font-size:11px;font-weight:700}
+/* TODOS - PROGRESS & PRIORITY SECTIONS */
+.todo-progress{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:18px;animation:fadeIn .3s ease}
+.todo-progress-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.todo-progress-text{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim)}
+.todo-progress-pct{font-family:'JetBrains Mono';font-size:12px;font-weight:700;color:var(--accent)}
+.todo-progress-bar{width:100%;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;border:1px solid var(--border)}
+.todo-progress-fill{height:100%;background:linear-gradient(90deg,var(--sc),var(--ss));border-radius:4px;transition:width .6s cubic-bezier(.34,.1,.68,.55)}
+.todo-tabs{display:flex;gap:6px;margin-bottom:20px}
+.todo-tab{flex:1;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.5px}
+.todo-tab:hover{border-color:var(--border-glow);background:var(--bg4)}
+.todo-tab.active-t{border-color:var(--ss);background:rgba(0,212,255,.08)}
+.todo-tab.active-k{border-color:var(--scr);background:rgba(184,77,255,.08)}
+.todo-priority-group{margin-bottom:18px}
+.todo-priority-header{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);padding:10px 0 8px;border-bottom:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.todo-priority-header.urgent{color:var(--su)}
+.todo-priority-header.urgent::before{content:'';width:3px;height:14px;background:var(--su);border-radius:1px}
+.todo-priority-header.normal{color:var(--se)}
+.todo-priority-header.normal::before{content:'';width:3px;height:14px;background:var(--se);border-radius:1px}
+.todo-priority-header.later{color:var(--ss)}
+.todo-priority-header.later::before{content:'';width:3px;height:14px;background:var(--ss);border-radius:1px}
+.todo-item{display:flex;align-items:flex-start;gap:12px;padding:16px;border-radius:10px;border-left:4px solid var(--border);background:var(--bg3);margin-bottom:10px;transition:all .25s;animation:slideR .3s ease;position:relative}
+.todo-item:hover{background:var(--bg4);border-left-color:var(--border-glow)}
+.todo-item.priority-high{border-left-color:var(--su)}
+.todo-item.priority-medium{border-left-color:var(--se)}
+.todo-item.priority-low{border-left-color:var(--ss)}
+.todo-item:hover .todo-actions{opacity:1}
+.todo-check{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;flex-shrink:0;margin-top:2px;background:var(--bg2)}
+.todo-check:hover{border-color:var(--border-glow);box-shadow:0 0 12px rgba(255,255,255,.06)}
+.todo-check.done{background:var(--sc);border-color:var(--sc);animation:scaleCheck .35s cubic-bezier(.34,.1,.68,.55)}
+.todo-check.done::after{content:'\2713';color:var(--bg);font-size:13px;font-weight:700}
+@keyframes scaleCheck{0%{transform:scale(.8);opacity:.5}100%{transform:scale(1);opacity:1}}
 .todo-body{flex:1;min-width:0}
-.todo-text{font-size:13px;letter-spacing:.2px;line-height:1.4}
+.todo-main{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:6px}
+.todo-text{font-size:13px;letter-spacing:.2px;line-height:1.4;flex:1}
 .todo-text.done{text-decoration:line-through;color:var(--text-muted)}
-.todo-meta{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center}
-.todo-tag{font-size:8px;padding:2px 8px;border-radius:10px;letter-spacing:.8px;text-transform:uppercase;font-weight:600}
-.todo-tag.high{background:rgba(255,59,59,.12);color:var(--su)}
-.todo-tag.medium{background:rgba(255,136,0,.12);color:var(--se)}
-.todo-tag.low{background:rgba(0,212,255,.12);color:var(--ss)}
-.todo-tag.proj{background:rgba(255,255,255,.05);color:var(--text-dim);border:1px solid var(--border)}
-.todo-actions{display:flex;gap:4px;flex-shrink:0}
-.todo-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .2s}
+.todo-project{font-size:9px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;padding:3px 8px;background:var(--bg2);border-radius:6px;flex-shrink:0}
+.todo-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:9px;color:var(--text-muted)}
+.todo-meta-time{display:flex;align-items:center;gap:4px;color:var(--sc)}
+.todo-meta-recur{display:flex;align-items:center;gap:4px;color:var(--scr);padding:2px 6px;background:rgba(184,77,255,.08);border-radius:4px}
+.todo-meta-overdue{display:flex;align-items:center;gap:4px;color:var(--su);font-weight:600}
+.todo-actions{display:flex;gap:6px;flex-shrink:0;opacity:0;transition:opacity .2s}
+@media(max-width:900px){.todo-actions{opacity:1}}
+.todo-btn{width:32px;height:32px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s;flex-shrink:0}
 .todo-btn:hover{background:var(--bg4);border-color:var(--border-glow);color:var(--text)}
 .todo-btn.sched:hover{color:var(--sc);border-color:rgba(0,255,136,.3)}
 .todo-btn.del:hover{color:var(--su);border-color:rgba(255,59,59,.3)}
-.todo-item.overdue{border-color:rgba(255,59,59,.5);background:rgba(255,59,59,.04);animation:pulse 2s ease infinite}
-.todo-item.dragging{opacity:.4;border-color:var(--ss)}
-.todo-item.drag-over{border-color:var(--ss);box-shadow:0 -2px 0 var(--ss)}
-.drag-grip{cursor:grab;color:var(--text-muted);font-size:14px;letter-spacing:-2px;padding:0 4px;user-select:none;flex-shrink:0;display:flex;align-items:center}
+.todo-item.overdue{border-left-color:var(--su);background:rgba(255,59,59,.06);animation:pulse 2s ease infinite}
+.todo-item.dragging{opacity:.4;border-left-color:var(--ss)}
+.todo-item.drag-over{border-left-color:var(--ss);box-shadow:inset 0 -2px 0 var(--ss)}
+.drag-grip{cursor:grab;color:var(--text-muted);font-size:14px;letter-spacing:-2px;padding:0 4px;user-select:none;flex-shrink:0;display:flex;align-items:center;margin-left:-8px}
 .drag-grip:active{cursor:grabbing}
 .todo-text{cursor:text}
-.subtasks-list{margin-top:8px;padding-left:10px;border-left:2px solid var(--border)}
-.subtask-item{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:12px}
-.subtask-check{width:14px;height:14px;border-radius:3px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0}
+.subtasks-list{margin-top:10px;padding-left:12px;border-left:2px solid var(--border);animation:fadeIn .25s ease}
+.subtask-item{display:flex;align-items:center;gap:8px;padding:8px 0;font-size:12px}
+.subtask-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0;background:var(--bg2)}
+.subtask-check:hover{border-color:var(--border-glow)}
 .subtask-check.done{background:var(--sc);border-color:var(--sc)}
 .subtask-check.done::after{content:'\2713';color:var(--bg);font-size:9px;font-weight:700}
 .subtask-text{flex:1;color:var(--text)}
@@ -177,8 +197,14 @@ select.input{cursor:pointer;-webkit-appearance:none}
 .mrow{margin-bottom:12px}
 .mlbl{font-size:9px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px}
 .mactions{display:flex;gap:8px;margin-top:20px;justify-content:flex-end}
-.done-section{margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
-.done-title{font-size:9px;color:var(--text-muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.done-section{margin-top:20px;padding-top:14px;border-top:1px solid var(--border)}
+.done-toggle{display:flex;align-items:center;gap:8px;padding:8px 0;cursor:pointer;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-dim);transition:color .2s;user-select:none}
+.done-toggle:hover{color:var(--text-muted)}
+.done-toggle-icon{display:flex;align-items:center;justify-content:center;width:16px;height:16px;transition:transform .2s}
+.done-toggle.expanded .done-toggle-icon{transform:rotate(90deg)}
+.done-items{display:flex;flex-direction:column;gap:8px;animation:fadeIn .25s ease}
+.done-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:8px;background:rgba(255,255,255,.02);opacity:.6;transition:all .2s}
+.done-item:hover{opacity:.8;background:rgba(255,255,255,.04)}
 @media(max-width:900px){
   .topbar{padding:8px 12px}
   .logo-icon{width:32px;height:32px}.logo-icon img{width:32px;height:32px}
@@ -206,9 +232,10 @@ select.input{cursor:pointer;-webkit-appearance:none}
   .card{padding:12px;margin-bottom:10px}
   .slots{grid-template-columns:repeat(2,1fr);gap:6px}
   .slot{padding:10px}.slot-time{font-size:13px}
-  .todo-tabs{gap:3px;margin-bottom:12px}.todo-tab{padding:10px;gap:6px}
-  .todo-tab .tab-name{font-size:12px}.todo-tab .tab-count{font-size:10px}
-  .todo-item{padding:10px;gap:8px}.todo-text{font-size:12px}
+  .todo-tabs{gap:4px;margin-bottom:12px}.todo-tab{padding:10px;font-size:11px}
+  .todo-item{padding:12px;gap:10px}.todo-text{font-size:12px}
+  .todo-progress{padding:10px;margin-bottom:12px}
+  .todo-priority-header{font-size:8px;padding:8px 0 6px}
   .add-bar{gap:4px}.input{padding:7px 10px;font-size:11px}.btn{padding:7px 12px;font-size:10px}
   .modal{padding:20px;width:95vw}
   .alert{padding:8px 10px;font-size:10px}
@@ -448,6 +475,7 @@ function App(){
   const[dragOverId,setDragOverId]=useState(null);
   const[expandedTodo,setExpandedTodo]=useState(null);
   const[newSubtext,setNewSubtext]=useState('');
+  const[showDone,setShowDone]=useState(false);
   const[notifs,setNotifs]=useSyncedState('sbas_notifs',[]);
 
   // OUTREACH STATE
@@ -605,7 +633,7 @@ function App(){
 
     {notifs.filter(n=>Date.now()-n.ts<10000).map(n=>(
       <div key={n.id} className="notif-banner">
-        <span>🔔</span><span><strong>{n.from}</strong> une nouvelle tache : "{n.text}"</span>
+        <span>ð</span><span><strong>{n.from}</strong> une nouvelle tache : "{n.text}"</span>
         <button onClick={()=>setNotifs(prev=>prev.filter(x=>x.id!==n.id))}>&times;</button>
       </div>
     ))}
@@ -727,19 +755,25 @@ function App(){
           )}
         </div>)}
 
-        {/* TODOS - SEPARATED TABS */}
+        {/* TODOS - REDESIGNED */}
         {tab==='todos'&&(
         <div className="tab-c">
           <div className="todo-tabs">
             <div className={"todo-tab "+(todoView==='titouan'?'active-t':'')} onClick={()=>setTodoView('titouan')}>
-              <div className="avatar on" style={{width:30,height:30,fontSize:12,background:'linear-gradient(135deg,#0a1628,#1a2638)'}}>T</div>
-              <div className="tab-name">Titouan</div>
-              <div className="tab-count">{todos.filter(t=>t.owner==='titouan'&&!t.done).length} actives</div>
+              Titouan <span style={{fontFamily:"'JetBrains Mono'",fontSize:10,color:'var(--text-muted)'}}>{todos.filter(t=>t.owner==='titouan'&&!t.done).length}</span>
             </div>
             <div className={"todo-tab "+(todoView==='keda'?'active-k':'')} onClick={()=>setTodoView('keda')}>
-              <div className="avatar on" style={{width:30,height:30,fontSize:12,background:'linear-gradient(135deg,#1a0a28,#2a1a38)'}}>K</div>
-              <div className="tab-name">Keda</div>
-              <div className="tab-count">{todos.filter(t=>t.owner==='keda'&&!t.done).length} actives</div>
+              Keda <span style={{fontFamily:"'JetBrains Mono'",fontSize:10,color:'var(--text-muted)'}}>{todos.filter(t=>t.owner==='keda'&&!t.done).length}</span>
+            </div>
+          </div>
+
+          <div className="todo-progress">
+            <div className="todo-progress-label">
+              <span className="todo-progress-text">Progression</span>
+              <span className="todo-progress-pct">{curTodos.length>0?Math.round((doneTodos.length/curTodos.length)*100):0}%</span>
+            </div>
+            <div className="todo-progress-bar">
+              <div className="todo-progress-fill" style={{width:(curTodos.length>0?Math.round((doneTodos.length/curTodos.length)*100):0)+'%'}}></div>
             </div>
           </div>
 
@@ -747,57 +781,75 @@ function App(){
 
           {activeTodos.length===0&&<div style={{textAlign:'center',padding:40,color:'var(--text-muted)',fontSize:13}}>Aucune tache active pour {todoView==='titouan'?'Titouan':'Keda'}</div>}
 
-          {activeTodos.map(t=>(
-            <div key={t.id} className={"todo-item"+(isOverdue(t)?" overdue":"")+(dragId===t.id?" dragging":"")+(dragOverId===t.id&&dragId!==t.id?" drag-over":"")} draggable={editingTodo!==t.id} onDragStart={e=>onDragStart(e,t.id)} onDragOver={e=>onDragOver(e,t.id)} onDragEnd={onDragEnd} onDrop={e=>onDrop(e,t.id)}>
-              <div className="drag-grip" title="Glisser pour deplacer">⠗</div>
-              <div className="todo-check" onClick={()=>toggleTodo(t.id)}></div>
-              <div className="todo-body">
-                {editingTodo===t.id?(
-                  <input className="input" style={{flex:1,marginBottom:6}} value={editText} onChange={e=>setEditText(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')saveEdit(t.id);if(e.key==='Escape')setEditingTodo(null);}} onBlur={()=>saveEdit(t.id)} autoFocus/>
-                ):(
-                  <div className="todo-text" onClick={()=>startEdit(t)}>{t.text}</div>
-                )}
-                <div className="todo-meta">
-                  <span className={"todo-tag "+t.priority}>{t.priority}</span>
-                  <span className="todo-tag proj">{t.project}</span>
-                  {t.scheduled&&<span style={{fontSize:8,color:'var(--sc)'}}>&#128197; {FDAYS[t.scheduled.day]} {fmtTime(t.scheduled.start)}&mdash;{fmtTime(t.scheduled.end)}</span>}
-                  {t.recurrence&&<span className="recurring-badge">{t.recurrence==='daily'?'Quotidien':t.recurrence==='weekly'?'Hebdo':'Mensuel'}</span>}
-                  {isOverdue(t)&&<span style={{fontSize:8,color:'var(--su)',fontWeight:600}}>EN RETARD</span>}
-                </div>
-                {expandedTodo===t.id&&(
-                  <div className="subtasks-list">
-                    {(t.subtasks||[]).map(s=>(
-                      <div key={s.id} className="subtask-item">
-                        <div className={"subtask-check"+(s.done?" done":"")} onClick={()=>toggleSubtask(t.id,s.id)}></div>
-                        <div className={"subtask-text"+(s.done?" done":"")}>{s.text}</div>
-                        <button className="todo-btn" style={{width:20,height:20,fontSize:10}} onClick={()=>deleteSubtask(t.id,s.id)}>&times;</button>
-                      </div>
-                    ))}
-                    <div style={{display:'flex',gap:6,marginTop:8}}>
-                      <input className="input" style={{flex:1,fontSize:11}} placeholder="Ajouter sous-tache..." value={newSubtext} onChange={e=>setNewSubtext(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){addSubtask(t.id,newSubtext);setNewSubtext('');}}}/>
-                      <button className="btn btn-sm" onClick={()=>{addSubtask(t.id,newSubtext);setNewSubtext('');}}>+</button>
+          {[{key:'high',label:'URGENT',cls:'urgent'},{key:'medium',label:'EN COURS',cls:'normal'},{key:'low',label:'PLUS TARD',cls:'later'}].map(grp=>{
+            const items=activeTodos.filter(t=>t.priority===grp.key);
+            if(!items.length) return null;
+            return(
+            <div key={grp.key} className="todo-priority-group">
+              <div className={"todo-priority-header "+grp.cls}>{grp.label} ({items.length})</div>
+              {items.map(t=>(
+                <div key={t.id} className={"todo-item priority-"+t.priority+(isOverdue(t)?" overdue":"")+(dragId===t.id?" dragging":"")+(dragOverId===t.id&&dragId!==t.id?" drag-over":"")} draggable={editingTodo!==t.id} onDragStart={e=>onDragStart(e,t.id)} onDragOver={e=>onDragOver(e,t.id)} onDragEnd={onDragEnd} onDrop={e=>onDrop(e,t.id)}>
+                  <div className="drag-grip" title="Glisser">&#x2807;</div>
+                  <div className="todo-check" onClick={()=>toggleTodo(t.id)}></div>
+                  <div className="todo-body">
+                    <div className="todo-main">
+                      {editingTodo===t.id?(
+                        <input className="input" style={{flex:1}} value={editText} onChange={e=>setEditText(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')saveEdit(t.id);if(e.key==='Escape')setEditingTodo(null);}} onBlur={()=>saveEdit(t.id)} autoFocus/>
+                      ):(
+                        <div className="todo-text" onClick={()=>startEdit(t)}>{t.text}</div>
+                      )}
+                      {t.project&&<span className="todo-project">{t.project}</span>}
                     </div>
+                    <div className="todo-meta">
+                      {t.scheduled&&<span className="todo-meta-time">&#128197; {FDAYS[t.scheduled.day]} {fmtTime(t.scheduled.start)}&mdash;{fmtTime(t.scheduled.end)}</span>}
+                      {t.recurrence&&<span className="todo-meta-recur">{t.recurrence==='daily'?'Quotidien':t.recurrence==='weekly'?'Hebdo':'Mensuel'}</span>}
+                      {isOverdue(t)&&<span className="todo-meta-overdue">EN RETARD</span>}
+                    </div>
+                    {expandedTodo===t.id&&(
+                      <div className="subtasks-list">
+                        {(t.subtasks||[]).map(s=>(
+                          <div key={s.id} className="subtask-item">
+                            <div className={"subtask-check"+(s.done?" done":"")} onClick={()=>toggleSubtask(t.id,s.id)}></div>
+                            <div className={"subtask-text"+(s.done?" done":"")}>{s.text}</div>
+                            <button className="todo-btn" style={{width:20,height:20,fontSize:10,opacity:1}} onClick={()=>deleteSubtask(t.id,s.id)}>&times;</button>
+                          </div>
+                        ))}
+                        <div style={{display:'flex',gap:6,marginTop:8}}>
+                          <input className="input" style={{flex:1,fontSize:11}} placeholder="Ajouter sous-tache..." value={newSubtext} onChange={e=>setNewSubtext(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){addSubtask(t.id,newSubtext);setNewSubtext('');}}}/>
+                          <button className="btn btn-sm" onClick={()=>{addSubtask(t.id,newSubtext);setNewSubtext('');}}>+</button>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-              <div className="todo-actions">
-                <button className="todo-btn" title="Sous-taches" onClick={()=>toggleExpand(t.id)}>{expandedTodo===t.id?'▾':'▸'}</button>
-                <button className="todo-btn sched" title="Planifier" onClick={()=>openSchedule(t)}>&#128197;</button>
-                <button className="todo-btn del" title="Supprimer" onClick={()=>deleteTodo(t.id)}>&times;</button>
-              </div>
-            </div>
-          ))}
+                  <div className="todo-actions">
+                    <button className="todo-btn" title="Sous-taches" onClick={()=>toggleExpand(t.id)}>{expandedTodo===t.id?'\u25BE':'\u25B8'}</button>
+                    <button className="todo-btn sched" title="Planifier" onClick={()=>openSchedule(t)}>&#128197;</button>
+                    <button className="todo-btn del" title="Supprimer" onClick={()=>deleteTodo(t.id)}>&times;</button>
+                  </div>
+                </div>
+              ))}
+            </div>);
+          })}
 
           {doneTodos.length>0&&(
             <div className="done-section">
-              <div className="done-title">Terminees ({doneTodos.length})</div>
-              {doneTodos.map(t=>(
-                <div key={t.id} className="todo-item" style={{opacity:.45}}>
-                  <div className="todo-check done" onClick={()=>toggleTodo(t.id)}></div>
-                  <div className="todo-body"><div className="todo-text done">{t.text}</div></div>
-                  <div className="todo-actions"><button className="todo-btn del" onClick={()=>deleteTodo(t.id)}>&times;</button></div>
+              <div className={"done-toggle"+(showDone?" expanded":"")} onClick={()=>setShowDone(!showDone)}>
+                <span className="done-toggle-icon">&#x25B6;</span>
+                Terminees ({doneTodos.length})
+              </div>
+              {showDone&&(
+                <div className="done-items">
+                  {doneTodos.map(t=>(
+                    <div key={t.id} className="done-item">
+                      <div className="todo-check done" onClick={()=>toggleTodo(t.id)}></div>
+                      <div className="todo-body"><div className="todo-text done">{t.text}</div></div>
+                      <div style={{display:'flex',gap:4}}>
+                        <button className="todo-btn del" style={{opacity:1,width:28,height:28}} onClick={()=>deleteTodo(t.id)}>&times;</button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           )}
 
@@ -864,7 +916,7 @@ function App(){
               <label>Target @</label>
               <input placeholder="name or @handle" value={orName} onChange={e=>setOrName(e.target.value)}/>
             </div>
-            <div className="or-sh">Phase 01 — Diagnostic</div>
+            <div className="or-sh">Phase 01 â Diagnostic</div>
             <div className="or-sd">Scan the account. Check every point. Note observations.</div>
             <div className="or-grid">
               {[
@@ -887,13 +939,13 @@ function App(){
 
           {/* STEP 1: BLOCS */}
           {orStep===1&&(<div style={{animation:'fadeIn .25s ease'}}>
-            <div className="or-sh">Phase 02 — Message Builder</div>
+            <div className="or-sh">Phase 02 â Message Builder</div>
             <div className="or-sd">Select the blocs that match your diagnostic. Combine for a unique DM.</div>
             {[
-              {icon:'📉',title:'Reach / Algorithm',sub:'When you detect a view drop'},
-              {icon:'🔗',title:'Funnel / LinkMe',sub:'When the OF link is buried or unoptimized'},
-              {icon:'📦',title:'Wishlist / Security',sub:'When you spot an Amazon Wishlist'},
-              {icon:'👁️',title:'Image Consistency',sub:'General approach based on visual audit'}
+              {icon:'ð',title:'Reach / Algorithm',sub:'When you detect a view drop'},
+              {icon:'ð',title:'Funnel / LinkMe',sub:'When the OF link is buried or unoptimized'},
+              {icon:'ð¦',title:'Wishlist / Security',sub:'When you spot an Amazon Wishlist'},
+              {icon:'ðï¸',title:'Image Consistency',sub:'General approach based on visual audit'}
             ].map((b,i)=>(
               <div key={i} className={"or-bloc"+(orBlocs[i]?' sel':'')} >
                 <div className="or-bhead" onClick={()=>orToggleBloc(i)}>
@@ -901,7 +953,7 @@ function App(){
                     <div className="or-bicon">{b.icon}</div>
                     <div><h4>{b.title}</h4><div className="or-bsub">{b.sub}</div></div>
                   </div>
-                  <button className="or-btog">{orBlocs[i]?'−':'+'}</button>
+                  <button className="or-btog">{orBlocs[i]?'â':'+'}</button>
                 </div>
                 {orBlocs[i]&&(
                   <div className="or-bbody" style={{display:'block'}}>
@@ -922,20 +974,20 @@ function App(){
 
           {/* STEP 2: FREESTYLE */}
           {orStep===2&&(<div style={{animation:'fadeIn .25s ease'}}>
-            <div className="or-sh">Phase 03 — Creative Flow</div>
+            <div className="or-sh">Phase 03 â Creative Flow</div>
             <div className="or-sd">Spotted something unique? Write your message from scratch here.</div>
             <div className="or-free">
               <h4>Freestyle Zone</h4>
-              <p className="hint">Structure: specific observation → value add → closed question.</p>
-              <textarea placeholder={"e.g. Hey "+(orName||'[Name]')+", I noticed you post a lot of behind-the-scenes but don't highlight them — that's exactly the type of content that converts on OF..."} value={orFree} onChange={e=>setOrFree(e.target.value)}/>
+              <p className="hint">Structure: specific observation â value add â closed question.</p>
+              <textarea placeholder={"e.g. Hey "+(orName||'[Name]')+", I noticed you post a lot of behind-the-scenes but don't highlight them â that's exactly the type of content that converts on OF..."} value={orFree} onChange={e=>setOrFree(e.target.value)}/>
               <div className="or-cc">{orFree.length} chars</div>
             </div>
             <div className="or-tips">
               <h4>Freestyle Reminders</h4>
-              <p>→ Mention a SPECIFIC detail from the account (a Reel, a highlight, a post)<br/>
-              → Show you spent time looking (not just skimmed)<br/>
-              → Offer concrete value (audit video, actionable tip)<br/>
-              → ALWAYS end with a closed question</p>
+              <p>â Mention a SPECIFIC detail from the account (a Reel, a highlight, a post)<br/>
+              â Show you spent time looking (not just skimmed)<br/>
+              â Offer concrete value (audit video, actionable tip)<br/>
+              â ALWAYS end with a closed question</p>
             </div>
             <div className="or-nav">
               <button className="btn" onClick={()=>orGoStep(1)}>&larr; Blocs</button>
@@ -945,7 +997,7 @@ function App(){
 
           {/* STEP 3: CLOSE */}
           {orStep===3&&(<div style={{animation:'fadeIn .25s ease'}}>
-            <div className="or-sh">Phase 04 — Punch Final</div>
+            <div className="or-sh">Phase 04 â Punch Final</div>
             <div className="or-sd">Write the closing question that forces a response.</div>
             <div className="or-close">
               <h4>Your Closing Question</h4>
@@ -960,7 +1012,7 @@ function App(){
 
           {/* STEP 4: SEND */}
           {orStep===4&&(<div style={{animation:'fadeIn .25s ease'}}>
-            <div className="or-sh">Phase 05 — Ready to Send</div>
+            <div className="or-sh">Phase 05 â Ready to Send</div>
             <div className="or-sd">Review, adjust if needed, copy and send.</div>
             <div className="or-final">
               <div className="fl">Assembled DM</div>
