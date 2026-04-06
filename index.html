@@ -541,41 +541,54 @@ function App(){
       let tasks=cleaned.split(separators).map(t=>t.replace(/^[\s,.\-:]+|[\s,.\-:]+$/g,'').trim()).filter(t=>t.length>2);
       if(tasks.length===0)tasks=[cleaned];
       const cleanTitle=(raw)=>{
-        let t=raw.trim();
-        t=t.replace(/^(il faut que je|il faut que j'|il faut|je dois|je veux|je voudrais|j'aimerais|j'ai besoin de|faut que je|faut que j'|faut|faudrait que je|faudrait que j'|il faudrait que je|il faudrait|penser? [aà]|n'oublie pas de|oublie pas de|rappelle[- ]?moi de|pense [aà]|il y a|faire)\s+/i,'');
-        t=t.replace(/^(que je|que j'|que l'on|qu'on)\s+/i,'');
-        t=t.replace(/\s+(s'il te pla[iî]t|stp|please|voil[aà]|quoi|en fait|du coup|ok|hein|bref|genre|tu vois|tu sais)$/i,'');
-        t=t.replace(/^(le |la |les |l'|un |une |des |du |de la |au |aux )/i,(m)=>m);
-        t=t.replace(/^appeler\s+/i,'Appel ');
-        t=t.replace(/^rappeler\s+/i,'Rappel ');
-        t=t.replace(/^envoyer\s+(un |une |le |la |l'|des |les )?/i,'Envoi ');
-        t=t.replace(/^contacter\s+/i,'Contact ');
-        t=t.replace(/^pr[eé]parer\s+(le |la |les |l'|un |une )?/i,'Prep ');
-        t=t.replace(/^r[eé]pondre\s+([aà]\s+)?/i,'Reponse ');
-        t=t.replace(/^v[eé]rifier\s+(le |la |les |l')?/i,'Verif ');
-        t=t.replace(/^mettre [aà] jour\s+(le |la |les |l')?/i,'MAJ ');
-        t=t.replace(/^planifier\s+(le |la |les |l'|un |une )?/i,'Planif ');
-        t=t.replace(/^organiser\s+(le |la |les |l'|un |une )?/i,'Orga ');
-        t=t.replace(/^finaliser\s+(le |la |les |l'|un |une )?/i,'Finalisation ');
-        t=t.replace(/^cr[eé]er\s+(le |la |les |l'|un |une )?/i,'Creation ');
-        t=t.replace(/^rechercher\s+(le |la |les |l'|un |une |des )?/i,'Recherche ');
-        t=t.replace(/^chercher\s+(le |la |les |l'|un |une |des )?/i,'Recherche ');
-        t=t.replace(/^relancer\s+/i,'Relance ');
-        t=t.replace(/^suivre\s+(le |la |les |l')?/i,'Suivi ');
-        t=t.replace(/^r[eé]diger\s+(le |la |les |l'|un |une )?/i,'Redaction ');
-        t=t.replace(/^[eé]crire\s+(le |la |les |l'|un |une )?/i,'Redaction ');
-        t=t.replace(/^analyser\s+(le |la |les |l')?/i,'Analyse ');
-        t=t.replace(/^corriger\s+(le |la |les |l')?/i,'Correction ');
-        t=t.replace(/^terminer\s+(le |la |les |l')?/i,'Finalisation ');
-        t=t.replace(/^finir\s+(le |la |les |l'|de )?/i,'Finalisation ');
-        t=t.replace(/^modifier\s+(le |la |les |l')?/i,'Modif ');
-        t=t.replace(/^lancer\s+(le |la |les |l'|un |une )?/i,'Lancement ');
+        const origWords=raw.trim().split(/\s+/);
+        const caseMap={};
+        origWords.forEach(w=>{const lo=w.toLowerCase().replace(/[^a-z\u00e0-\u00ff@#0-9]/gi,'');if(lo&&(w!==lo||/[A-Z]{2,}|@|#/.test(w)))caseMap[lo]=w;});
+        let t=raw.trim().toLowerCase();
+        for(let i=0;i<3;i++){
+          t=t.replace(/^(il faut que je|il faut que j'?|il faut|je dois|je veux|je voudrais|j'?aimerais|j'?ai besoin de|faut que je|faut que j'?|faudrait que je|faudrait que j'?|il faudrait que je|il faudrait|faut|faudrait|je vais|on doit|on va|penser?\s*[a\u00e0]|n'?oublie\s*pas\s*de|oublie\s*pas\s*de|rappelle[- ]?moi\s*de|pense\s*[a\u00e0]|il y a|je peux|tu peux|on peut|il faudra|va falloir)\s+/i,'');
+          t=t.replace(/^(que je|que j'?|que l'?on|qu'?on|que tu|que nous)\s+/i,'');
+          t=t.replace(/^(faire|aller|fasse|fasses|fassions|aille[s]?|allions)\s+/i,'');
+        }
+        t=t.replace(/\s+(s'?il te pla[i\u00ee]t|s'?il vous pla[i\u00ee]t|stp|svp|please|voil[a\u00e0]|quoi|en fait|du coup|ok|hein|bref|genre|tu vois|tu sais|c'?est tout|merci)$/i,'');
+        const verbMap=[
+          [/^(appeler|appelle[rs]?)\s+/i,'Appel '],[/^(rappeler|rappelle[rs]?)\s+/i,'Rappel '],
+          [/^(envoyer|envoie[rs]?|envoy[e\u00e9])\s+/i,'Envoi '],[/^(contacter|contacte[rs]?)\s+/i,'Contact '],
+          [/^(pr[e\u00e9]parer|pr[e\u00e9]pare[rs]?)\s+/i,'Prep '],[/^(r[e\u00e9]pondre|r[e\u00e9]ponds?)\s+/i,'Reponse '],
+          [/^(v[e\u00e9]rifier|v[e\u00e9]rifie[rs]?|check(?:er)?)\s+/i,'Verif '],
+          [/^(mettre [a\u00e0] jour|update[r]?|maj)\s+/i,'MAJ '],
+          [/^(planifier|planifie[rs]?|programmer|programme[rs]?)\s+/i,'Planif '],
+          [/^(organiser|organise[rs]?)\s+/i,'Orga '],
+          [/^(finaliser|finalise[rs]?|terminer|termine[rs]?|finir?|finis(?:se[rs]?)?|finissons|boucler|boucle[rs]?)\s+/i,'Finalisation '],
+          [/^(cr[e\u00e9]er|cr[e\u00e9]e[rs]?)\s+/i,'Creation '],
+          [/^(rechercher|recherche[rs]?|chercher|cherche[rs]?|trouver|trouve[rs]?)\s+/i,'Recherche '],
+          [/^(relancer|relance[rs]?)\s+/i,'Relance '],[/^(suivre|suis|suivons)\s+/i,'Suivi '],
+          [/^(r[e\u00e9]diger|r[e\u00e9]dige[rs]?|[e\u00e9]crire|[e\u00e9]cris)\s+/i,'Redaction '],
+          [/^(analyser|analyse[rs]?)\s+/i,'Analyse '],[/^(corriger|corrige[rs]?)\s+/i,'Correction '],
+          [/^(modifier|modifie[rs]?|changer|change[rs]?)\s+/i,'Modif '],
+          [/^(lancer|lance[rs]?)\s+/i,'Lancement '],[/^(tester|teste[rs]?)\s+/i,'Test '],
+          [/^(poster|poste[rs]?|publier|publie[rs]?)\s+/i,'Post '],
+          [/^(retourner|retourne[rs]?)\s+/i,'Retour '],[/^(confirmer|confirme[rs]?)\s+/i,'Confirmation '],
+          [/^(r[e\u00e9]cup[e\u00e9]rer|r[e\u00e9]cup[e\u00e9\u00e8]re[rs]?)\s+/i,'Recup '],
+          [/^(supprimer|supprime[rs]?)\s+/i,'Suppression '],[/^(configurer|configure[rs]?)\s+/i,'Config '],
+          [/^(design(?:er)?)\s+/i,'Design '],
+          [/^(fixer|fixe[rs]?|r[e\u00e9]parer|r[e\u00e9]pare[rs]?|r[e\u00e9]gler|r[e\u00e9\u00e8]gle[rs]?)\s+/i,'Fix '],
+        ];
+        let prefix='';
+        for(const[rx,rep] of verbMap){if(rx.test(t)){t=t.replace(rx,'');prefix=rep;break;}}
+        t=t.replace(/^(le |la |les |l'|un |une |des |du |de la |de l'|au |aux |de |d')/i,'');
+        t=(' '+t+' ').replace(/ (que|qui|est|sont|c'est|ce sont|il y a|je|tu|il|on|nous|faire|fait|sur les|sur le|sur la|dans les|dans le|dans la|pour le|pour la|pour les|avec le|avec la|avec les) /gi,' ').trim();
+        t=t.replace(/ (le |la |les |l'|un |une |des |du )/gi,' ');
         t=t.replace(/\s+/g,' ').trim();
-        t=t.charAt(0).toUpperCase()+t.slice(1);
-        if(t.length>60)t=t.substring(0,57)+'...';
+        t=t.split(' ').map(w=>{const lo=w.toLowerCase().replace(/[^a-z\u00e0-\u00ff@#0-9]/gi,'');return caseMap[lo]||w;}).join(' ');
+        t=prefix+t;
+        t=t.replace(/\b(\w+)\s+\1\b/gi,'$1');
+        t=t.replace(/\s+/g,' ').trim();
+        if(t.length>0) t=t.charAt(0).toUpperCase()+t.slice(1);
+        if(t.length>55)t=t.substring(0,52)+'...';
         return t;
       };
-      tasks=tasks.map(t=>cleanTitle(t));
+            tasks=tasks.map(t=>cleanTitle(t));
       tasks.forEach((taskText,i)=>{
         setTimeout(()=>{
           const tid=Date.now()+i;
