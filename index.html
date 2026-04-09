@@ -126,6 +126,21 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tex
 .todo-priority-header.later::before{content:'';width:3px;height:14px;background:var(--ss);border-radius:1px}
 .todo-priority-header.scheduled-later{color:var(--scr)}
 .todo-priority-header.scheduled-later::before{content:'';width:3px;height:14px;background:var(--scr);border-radius:1px}
+.todo-priority-header.bloc-prep{color:#4ecdc4}
+.todo-priority-header.bloc-prep::before{content:'';width:3px;height:14px;background:#4ecdc4;border-radius:1px}
+.todo-priority-header.bloc-outreach{color:#00e676}
+.todo-priority-header.bloc-outreach::before{content:'';width:3px;height:14px;background:#00e676;border-radius:1px}
+.todo-priority-header.bloc-chatting{color:#ff6b6b}
+.todo-priority-header.bloc-chatting::before{content:'';width:3px;height:14px;background:#ff6b6b;border-radius:1px}
+.todo-priority-header.bloc-socials{color:#7c4dff}
+.todo-priority-header.bloc-socials::before{content:'';width:3px;height:14px;background:#7c4dff;border-radius:1px}
+.todo-priority-header.bloc-kpi{color:#ffd93d}
+.todo-priority-header.bloc-kpi::before{content:'';width:3px;height:14px;background:#ffd93d;border-radius:1px}
+.todo-priority-header.bloc-decision{color:#ff9800}
+.todo-priority-header.bloc-decision::before{content:'';width:3px;height:14px;background:#ff9800;border-radius:1px}
+.todo-priority-header.bloc-other{color:#78909c}
+.todo-priority-header.bloc-other::before{content:'';width:3px;height:14px;background:#78909c;border-radius:1px}
+.bloc-count{opacity:.6;font-weight:400}
 .todo-item.priority-later{border-left-color:var(--scr)}
 .later-date-badge{font-size:8px;padding:2px 8px;border-radius:6px;background:rgba(184,77,255,.1);color:var(--scr);letter-spacing:.5px;font-weight:600;margin-left:6px}
 .todo-item{display:flex;align-items:flex-start;gap:12px;padding:16px;border-radius:10px;border-left:4px solid var(--border);background:var(--bg3);margin-bottom:10px;transition:all .25s;animation:slideR .3s ease;position:relative}
@@ -759,6 +774,10 @@ return t;
   const todayTodos=curTodos.filter(t=>!t.done&&isForToday(t));
   const laterTodos=curTodos.filter(t=>!t.done&&isForLater(t));
   const activeTodos=todayTodos;
+  const BLOCS_DEF=[{key:'prep',label:'PREP',projects:['orga','prep']},{key:'outreach',label:'OUTREACH',projects:['outreach','ads/outreach','prospection']},{key:'chatting',label:'CHATTING',projects:['chatting']},{key:'socials',label:'SOCIALS',projects:['socials','social','marketing']},{key:'kpi',label:'KPI',projects:['kpi','analytics','stats']},{key:'decision',label:'DECISION',projects:['decision','strategie','strategy']},{key:'other',label:'OTHER TASKS',projects:[]}];
+  const allActiveTodos=curTodos.filter(t=>!t.done);
+  const getBlocKey=(t)=>{const p=(t.project||'').toLowerCase();for(const b of BLOCS_DEF){if(b.projects.includes(p))return b.key;}return 'other';};
+  const blocTodos=BLOCS_DEF.map(b=>({...b,tasks:allActiveTodos.filter(t=>getBlocKey(t)===b.key)}));
   const doneTodos=curTodos.filter(t=>t.done);
 
   return(
@@ -935,12 +954,12 @@ return t;
           </div>
           {voiceText&&<div className={"voice-status "+(voiceStatus==='listening'?'active':voiceStatus==='success'?'success':'')}>{voiceText}</div>}
 
-          {todayTodos.length===0&&laterTodos.length===0&&<div style={{textAlign:'center',padding:40,color:'var(--text-muted)',fontSize:13}}>Aucune tache pour {todoView==='titouan'?'Titouan':'Keda'}</div>}
+          {allActiveTodos.length===0&&<div style={{textAlign:'center',padding:40,color:'var(--text-muted)',fontSize:13}}>Aucune tache pour {todoView==='titouan'?'Titouan':'Keda'}</div>}
 
-          {todayTodos.length>0&&(
-            <div className="todo-priority-group">
-              <div className="todo-priority-header urgent">AUJOURD&rsquo;HUI ({todayTodos.length})</div>
-              {todayTodos.map(t=>(
+          {blocTodos.map(bloc=>bloc.tasks.length>0&&(
+            <div key={bloc.key} className="todo-priority-group">
+              <div className={"todo-priority-header bloc-"+bloc.key}>{bloc.label} <span className="bloc-count">({bloc.tasks.length})</span></div>
+              {bloc.tasks.map(t=>(
                 <div key={t.id} className={"todo-item priority-"+t.priority+(isOverdue(t)?" overdue":"")+(dragId===t.id?" dragging":"")+(dragOverId===t.id&&dragId!==t.id?" drag-over":"")} draggable={editingTodo!==t.id} onDragStart={e=>onDragStart(e,t.id)} onDragOver={e=>onDragOver(e,t.id)} onDragEnd={onDragEnd} onDrop={e=>onDrop(e,t.id)}>
                   <div className="drag-grip" title="Glisser">&#x2807;</div>
                   <div className="todo-check" onClick={()=>toggleTodo(t.id)}></div>
@@ -981,53 +1000,8 @@ return t;
                   </div>
                 </div>
               ))}
-            </div>)}
-
-          {laterTodos.length>0&&(
-            <div className="todo-priority-group">
-              <div className="todo-priority-header scheduled-later">POUR PLUS TARD ({laterTodos.length})</div>
-              {laterTodos.map(t=>(
-                <div key={t.id} className={"todo-item priority-later"+(dragId===t.id?" dragging":"")+(dragOverId===t.id&&dragId!==t.id?" drag-over":"")} draggable={editingTodo!==t.id} onDragStart={e=>onDragStart(e,t.id)} onDragOver={e=>onDragOver(e,t.id)} onDragEnd={onDragEnd} onDrop={e=>onDrop(e,t.id)}>
-                  <div className="drag-grip" title="Glisser">&#x2807;</div>
-                  <div className="todo-check" onClick={()=>toggleTodo(t.id)}></div>
-                  <div className="todo-body">
-                    <div className="todo-main">
-                      {editingTodo===t.id?(
-                        <input className="input" style={{flex:1}} value={editText} onChange={e=>setEditText(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')saveEdit(t.id);if(e.key==='Escape')setEditingTodo(null);}} onBlur={()=>saveEdit(t.id)} autoFocus/>
-                      ):(
-                        <div className="todo-text" onClick={()=>startEdit(t)}>{t.text}</div>
-                      )}
-                      {t.project&&<span className="todo-project">{t.project}</span>}
-                    </div>
-                    <div className="todo-meta">
-                      {t.scheduled&&<span className="todo-meta-time">&#128197; {FDAYS[t.scheduled.day]} {fmtTime(t.scheduled.start)}&mdash;{fmtTime(t.scheduled.end)}</span>}
-                      {t.recurrence&&<span className="todo-meta-recur">{t.recurrence==='daily'?'Quotidien':t.recurrence==='weekly'?'Hebdo':'Mensuel'}</span>}
-                    </div>
-                    {expandedTodo===t.id&&(
-                      <div className="subtasks-list">
-                        {(t.subtasks||[]).map(s=>(
-                          <div key={s.id} className="subtask-item">
-                            <div className={"subtask-check"+(s.done?" done":"")} onClick={()=>toggleSubtask(t.id,s.id)}></div>
-                            <div className={"subtask-text"+(s.done?" done":"")}>{s.text}</div>
-                            <button className="todo-btn" style={{width:20,height:20,fontSize:10,opacity:1}} onClick={()=>deleteSubtask(t.id,s.id)}>&times;</button>
-                          </div>
-                        ))}
-                        <div style={{display:'flex',gap:6,marginTop:8}}>
-                          <input className="input" style={{flex:1,fontSize:11}} placeholder="Ajouter sous-tache..." value={newSubtext} onChange={e=>setNewSubtext(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){addSubtask(t.id,newSubtext);setNewSubtext('');}}}/>
-                          <button className="btn btn-sm" onClick={()=>{addSubtask(t.id,newSubtext);setNewSubtext('');}}>+</button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="todo-actions">
-                    <button className="todo-btn" title="Sous-taches" onClick={()=>toggleExpand(t.id)}>&#x25B8;</button>
-                    <button className="todo-btn sched" title="Planifier" onClick={()=>openSchedule(t)}>&#128197;</button>
-                    <button className="todo-btn del" title="Supprimer" onClick={()=>deleteTodo(t.id)}>&times;</button>
-                  </div>
-                </div>
-              ))}
             </div>
-          )}
+          ))}
 
                     {doneTodos.length>0&&(
             <div className="done-section">
@@ -1522,6 +1496,21 @@ body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--tex
 .todo-priority-header.later::before{content:'';width:3px;height:14px;background:var(--ss);border-radius:1px}
 .todo-priority-header.scheduled-later{color:var(--scr)}
 .todo-priority-header.scheduled-later::before{content:'';width:3px;height:14px;background:var(--scr);border-radius:1px}
+.todo-priority-header.bloc-prep{color:#4ecdc4}
+.todo-priority-header.bloc-prep::before{content:'';width:3px;height:14px;background:#4ecdc4;border-radius:1px}
+.todo-priority-header.bloc-outreach{color:#00e676}
+.todo-priority-header.bloc-outreach::before{content:'';width:3px;height:14px;background:#00e676;border-radius:1px}
+.todo-priority-header.bloc-chatting{color:#ff6b6b}
+.todo-priority-header.bloc-chatting::before{content:'';width:3px;height:14px;background:#ff6b6b;border-radius:1px}
+.todo-priority-header.bloc-socials{color:#7c4dff}
+.todo-priority-header.bloc-socials::before{content:'';width:3px;height:14px;background:#7c4dff;border-radius:1px}
+.todo-priority-header.bloc-kpi{color:#ffd93d}
+.todo-priority-header.bloc-kpi::before{content:'';width:3px;height:14px;background:#ffd93d;border-radius:1px}
+.todo-priority-header.bloc-decision{color:#ff9800}
+.todo-priority-header.bloc-decision::before{content:'';width:3px;height:14px;background:#ff9800;border-radius:1px}
+.todo-priority-header.bloc-other{color:#78909c}
+.todo-priority-header.bloc-other::before{content:'';width:3px;height:14px;background:#78909c;border-radius:1px}
+.bloc-count{opacity:.6;font-weight:400}
 .todo-item.priority-later{border-left-color:var(--scr)}
 .later-date-badge{font-size:8px;padding:2px 8px;border-radius:6px;background:rgba(184,77,255,.1);color:var(--scr);letter-spacing:.5px;font-weight:600;margin-left:6px}
 .todo-item{display:flex;align-items:flex-start;gap:12px;padding:16px;border-radius:10px;border-left:4px solid var(--border);background:var(--bg3);margin-bottom:10px;transition:all .25s;animation:slideR .3s ease;position:relative}
@@ -2135,6 +2124,10 @@ function App(){
   const todayTodos=curTodos.filter(t=>!t.done&&isForToday(t));
   const laterTodos=curTodos.filter(t=>!t.done&&isForLater(t));
   const activeTodos=todayTodos;
+  const BLOCS_DEF=[{key:'prep',label:'PREP',projects:['orga','prep']},{key:'outreach',label:'OUTREACH',projects:['outreach','ads/outreach','prospection']},{key:'chatting',label:'CHATTING',projects:['chatting']},{key:'socials',label:'SOCIALS',projects:['socials','social','marketing']},{key:'kpi',label:'KPI',projects:['kpi','analytics','stats']},{key:'decision',label:'DECISION',projects:['decision','strategie','strategy']},{key:'other',label:'OTHER TASKS',projects:[]}];
+  const allActiveTodos=curTodos.filter(t=>!t.done);
+  const getBlocKey=(t)=>{const p=(t.project||'').toLowerCase();for(const b of BLOCS_DEF){if(b.projects.includes(p))return b.key;}return 'other';};
+  const blocTodos=BLOCS_DEF.map(b=>({...b,tasks:allActiveTodos.filter(t=>getBlocKey(t)===b.key)}));
   const doneTodos=curTodos.filter(t=>t.done);
 
   return(
@@ -2311,12 +2304,12 @@ function App(){
           </div>
           {voiceText&&<div className={"voice-status "+(voiceStatus==='listening'?'active':voiceStatus==='success'?'success':'')}>{voiceText}</div>}
 
-          {todayTodos.length===0&&laterTodos.length===0&&<div style={{textAlign:'center',padding:40,color:'var(--text-muted)',fontSize:13}}>Aucune tache pour {todoView==='titouan'?'Titouan':'Keda'}</div>}
+          {allActiveTodos.length===0&&<div style={{textAlign:'center',padding:40,color:'var(--text-muted)',fontSize:13}}>Aucune tache pour {todoView==='titouan'?'Titouan':'Keda'}</div>}
 
-          {todayTodos.length>0&&(
-            <div className="todo-priority-group">
-              <div className="todo-priority-header urgent">AUJOURD&rsquo;HUI ({todayTodos.length})</div>
-              {todayTodos.map(t=>(
+          {blocTodos.map(bloc=>bloc.tasks.length>0&&(
+            <div key={bloc.key} className="todo-priority-group">
+              <div className={"todo-priority-header bloc-"+bloc.key}>{bloc.label} <span className="bloc-count">({bloc.tasks.length})</span></div>
+              {bloc.tasks.map(t=>(
                 <div key={t.id} className={"todo-item priority-"+t.priority+(isOverdue(t)?" overdue":"")+(dragId===t.id?" dragging":"")+(dragOverId===t.id&&dragId!==t.id?" drag-over":"")} draggable={editingTodo!==t.id} onDragStart={e=>onDragStart(e,t.id)} onDragOver={e=>onDragOver(e,t.id)} onDragEnd={onDragEnd} onDrop={e=>onDrop(e,t.id)}>
                   <div className="drag-grip" title="Glisser">&#x2807;</div>
                   <div className="todo-check" onClick={()=>toggleTodo(t.id)}></div>
@@ -2357,53 +2350,8 @@ function App(){
                   </div>
                 </div>
               ))}
-            </div>)}
-
-          {laterTodos.length>0&&(
-            <div className="todo-priority-group">
-              <div className="todo-priority-header scheduled-later">POUR PLUS TARD ({laterTodos.length})</div>
-              {laterTodos.map(t=>(
-                <div key={t.id} className={"todo-item priority-later"+(dragId===t.id?" dragging":"")+(dragOverId===t.id&&dragId!==t.id?" drag-over":"")} draggable={editingTodo!==t.id} onDragStart={e=>onDragStart(e,t.id)} onDragOver={e=>onDragOver(e,t.id)} onDragEnd={onDragEnd} onDrop={e=>onDrop(e,t.id)}>
-                  <div className="drag-grip" title="Glisser">&#x2807;</div>
-                  <div className="todo-check" onClick={()=>toggleTodo(t.id)}></div>
-                  <div className="todo-body">
-                    <div className="todo-main">
-                      {editingTodo===t.id?(
-                        <input className="input" style={{flex:1}} value={editText} onChange={e=>setEditText(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')saveEdit(t.id);if(e.key==='Escape')setEditingTodo(null);}} onBlur={()=>saveEdit(t.id)} autoFocus/>
-                      ):(
-                        <div className="todo-text" onClick={()=>startEdit(t)}>{t.text}</div>
-                      )}
-                      {t.project&&<span className="todo-project">{t.project}</span>}
-                    </div>
-                    <div className="todo-meta">
-                      {t.scheduled&&<span className="todo-meta-time">&#128197; {FDAYS[t.scheduled.day]} {fmtTime(t.scheduled.start)}&mdash;{fmtTime(t.scheduled.end)}</span>}
-                      {t.recurrence&&<span className="todo-meta-recur">{t.recurrence==='daily'?'Quotidien':t.recurrence==='weekly'?'Hebdo':'Mensuel'}</span>}
-                    </div>
-                    {expandedTodo===t.id&&(
-                      <div className="subtasks-list">
-                        {(t.subtasks||[]).map(s=>(
-                          <div key={s.id} className="subtask-item">
-                            <div className={"subtask-check"+(s.done?" done":"")} onClick={()=>toggleSubtask(t.id,s.id)}></div>
-                            <div className={"subtask-text"+(s.done?" done":"")}>{s.text}</div>
-                            <button className="todo-btn" style={{width:20,height:20,fontSize:10,opacity:1}} onClick={()=>deleteSubtask(t.id,s.id)}>&times;</button>
-                          </div>
-                        ))}
-                        <div style={{display:'flex',gap:6,marginTop:8}}>
-                          <input className="input" style={{flex:1,fontSize:11}} placeholder="Ajouter sous-tache..." value={newSubtext} onChange={e=>setNewSubtext(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'){addSubtask(t.id,newSubtext);setNewSubtext('');}}}/>
-                          <button className="btn btn-sm" onClick={()=>{addSubtask(t.id,newSubtext);setNewSubtext('');}}>+</button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="todo-actions">
-                    <button className="todo-btn" title="Sous-taches" onClick={()=>toggleExpand(t.id)}>&#x25B8;</button>
-                    <button className="todo-btn sched" title="Planifier" onClick={()=>openSchedule(t)}>&#128197;</button>
-                    <button className="todo-btn del" title="Supprimer" onClick={()=>deleteTodo(t.id)}>&times;</button>
-                  </div>
-                </div>
-              ))}
             </div>
-          )}
+          ))}
 
                     {doneTodos.length>0&&(
             <div className="done-section">
